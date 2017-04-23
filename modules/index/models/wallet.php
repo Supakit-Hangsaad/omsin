@@ -48,7 +48,7 @@ class Model extends \Kotchasan\Model
       array('transfer_to', $wallet)
     ));
     $result = $model->db()->createQuery()
-      ->unionAll($q1, $q2)
+      ->from(array($model->db()->createQuery()->unionAll($q1, $q2), 'Z'))
       ->toArray()
       ->first(Sql::SUM('income', 'income'), Sql::SUM('expense', 'expense'));
     return $result['income'] - $result['expense'];
