@@ -79,7 +79,7 @@ class View extends \Gcms\View
         array(
           'name' => 'status',
           'text' => '{LNG_Type}',
-          'options' => array('' => '{LNG_all items}', 'IN' => '{LNG_Income}', 'OUT' => '{LNG_Expense}', 'TRANSFER' => '{LNG_Transfer between accounts}', 'INT' => '{LNG_Summit}'),
+          'options' => array('' => '{LNG_all items}', 'IN' => '{LNG_Income}', 'OUT' => '{LNG_Expense}', 'TRANSFER' => '{LNG_Transfer between accounts}', 'INIT' => '{LNG_Summit}'),
           'value' => $owner['status']
         ),
         array(
@@ -147,7 +147,11 @@ class View extends \Gcms\View
    */
   public function onRow($item, $o, $prop)
   {
-    $item['category_id'] = isset($this->categories[$item['status']][$item['category_id']]) ? $this->categories[$item['status']][$item['category_id']] : 'Unknow';
+    if ($item['status'] == 'INIT') {
+      $item['category_id'] = '{LNG_Summit}';
+    } else {
+      $item['category_id'] = isset($this->categories[$item['status']][$item['category_id']]) ? $this->categories[$item['status']][$item['category_id']] : 'Unknow';
+    }
     if ($item['status'] == 'TRANSFER') {
       $res = array(
         isset($this->wallet[$item['wallet']]) ? $this->wallet[$item['wallet']] : 'Unknow',

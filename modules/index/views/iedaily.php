@@ -124,7 +124,11 @@ class View extends \Gcms\View
    */
   public function onRow($item, $o, $prop)
   {
-    $item['category_id'] = isset($this->categories[$item['status']][$item['category_id']]) ? $this->categories[$item['status']][$item['category_id']] : 'Unknow';
+    if ($item['status'] == 'INIT') {
+      $item['category_id'] = '{LNG_Summit}';
+    } else {
+      $item['category_id'] = isset($this->categories[$item['status']][$item['category_id']]) ? $this->categories[$item['status']][$item['category_id']] : 'Unknow';
+    }
     if ($item['status'] == 'TRANSFER') {
       $res = array(
         isset($this->wallet[$item['wallet']]) ? $this->wallet[$item['wallet']] : 'Unknow',
@@ -162,6 +166,6 @@ class View extends \Gcms\View
    */
   public function onCreateButton($btn, $attributes, $items)
   {
-    return $btn != 'edit' || $items['status'] == 'IN' || $items['status'] == 'OUT' ? $attributes : false;
+    return $btn != 'edit' || $items['status'] == 'IN' || $items['status'] == 'OUT' || $items['status'] == 'INIT' ? $attributes : false;
   }
 }

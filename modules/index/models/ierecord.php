@@ -78,8 +78,8 @@ class Model extends \Kotchasan\Model
           // โอนเงินระหว่างบัญชี
           $ret = self::transfer($request, $index);
         } elseif ($status == 'INIT') {
-          // เพิ่มกระเป๋าเงิน
-          $ret = self::addWallet($request, $index);
+          // กระเป๋าเงิน
+          $ret = self::wallet($request, $index);
         } else {
           // บันทึก รายรับ/รายจ่าย
           $ret = self::recording($request, $status, $index);
@@ -219,15 +219,13 @@ class Model extends \Kotchasan\Model
    * @param Request $request
    * @param object $index
    */
-  private static function addWallet(Request $request, $index)
+  private static function wallet(Request $request, $index)
   {
     $ret = array();
-    $wallet = $request->post('write_wallet_name')->topic();
-    if ($wallet == '') {
-      $ret['ret_write_wallet_name'] = 'Please fill in';
-    } else {
-      $model = new \Kotchasan\Model;
-      // ตรวจสอบกระเป๋าเงินที่มีอยู่แล้ว
+    $model = new \Kotchasan\Model;
+    $table_name = $model->getTableName('ierecord');
+    if ($index->id == 0) {
+      // ตรวจสอบกระเป๋าเงินซ้ำ
       $search = $model->db()->createQuery()
         ->from('category')
         ->where(array(
@@ -238,9 +236,10 @@ class Model extends \Kotchasan\Model
         ->toArray()
         ->first('category_id');
       if ($search) {
+        // มีกระเป๋าเงินนี้อยู่แล้ว
         $ret['ret_write_wallet_name'] = Language::replace('This :name already exist', array(':name' => Language::get('Wallet')));
       } else {
-        // บันทึกกระเป๋าเงิน
+        // อ่าน ID ของกระเป๋าเงินใหม่
         $search = $model->db()->createQuery()
           ->from('category')
           ->where(array(
@@ -250,7 +249,7 @@ class Model extends \Kotchasan\Model
           ->toArray()
           ->first(Sql::MAX('category_id', 'category_id'));
         $wallet_id = empty($search['category_id']) ? 1 : (1 + (int)$search['category_id']);
-        // save
+        // สร้างกระเป๋าเงิน
         $model->db()->insert($model->getTableName('category'), array(
           'owner_id' => $index->owner_id,
           'id' => 4,
@@ -259,7 +258,7 @@ class Model extends \Kotchasan\Model
         ));
         $amount = $request->post('write_amount')->toDouble();
         if ($amount > 0) {
-          $table_name = $model->getTableName('ierecord');
+          // บันทึก ยอดยกมา ถ้ามีการระบุจำนวนเงินมาด้วย
           $model->db()->insert($table_name, array(
             'owner_id' => $index->owner_id,
             'id' => Sql::NEXT('id', $table_name, array('owner_id', $index->owner_id)),
@@ -274,6 +273,14 @@ class Model extends \Kotchasan\Model
           ));
         }
       }
+    } else {
+      // แก้ไขรายการ ยอดยกมา
+      $model->db()->update($table_name, $index->id, array(
+        'comment' => $request->post('write_comment')->topic(),
+        'create_date' => $request->post('write_create_date')->date(),
+        'income' => $request->post('write_amount')->toDouble(),
+        'expense' => 0,
+      ));
     }
     return $ret;
   }

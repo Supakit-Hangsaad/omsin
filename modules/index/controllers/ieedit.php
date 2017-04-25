@@ -34,9 +34,14 @@ class Controller extends \Gcms\Controller
     // สมาชิก
     if ($login = Login::isMember()) {
       $index = \Index\Ierecord\Model::get($login['id'], $request->request('id')->toInt());
-      if ($index && ($index->status == 'IN' || $index->status == 'OUT')) {
+      $typies = array(
+        'IN' => 'Income',
+        'OUT' => 'Expense',
+        'INIT' => 'Summit',
+      );
+      if ($index && isset($typies[$index->status])) {
         // ข้อความ title bar
-        $this->title = Language::get('Details of').' '.Language::get($index->income > 0 ? 'Income' : 'Expense');
+        $this->title = Language::get('Details of').' '.Language::get($typies[$index->status]);
         // เลือกเมนู
         $this->menu = 'ierecord';
         // แสดงผล

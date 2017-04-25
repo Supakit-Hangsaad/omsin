@@ -74,16 +74,29 @@ class View extends \Gcms\View
       $label = '{LNG_Wallet}';
       $disabled = false;
     }
-    // wallet
-    $fieldset->add('select', array(
-      'id' => 'write_wallet',
-      'itemClass' => 'item',
-      'labelClass' => 'g-input icon-wallet',
-      'label' => $label,
-      'disabled' => $disabled,
-      'options' => \Index\Select\Model::wallets($index->owner_id),
-      'value' => $index->wallet
-    ));
+    if ($index->status == 'INIT') {
+      // wallet
+      $wallet = \Index\Select\Model::wallets($index->owner_id);
+      $fieldset->add('text', array(
+        'id' => 'write_wallet_name',
+        'itemClass' => 'item',
+        'labelClass' => 'g-input icon-wallet',
+        'label' => '{LNG_Wallet}',
+        'readonly' => true,
+        'value' => $wallet[$index->wallet]
+      ));
+    } else {
+      // wallet
+      $fieldset->add('select', array(
+        'id' => 'write_wallet',
+        'itemClass' => 'item',
+        'labelClass' => 'g-input icon-wallet',
+        'label' => $label,
+        'disabled' => $disabled || $index->status == 'INIT',
+        'options' => \Index\Select\Model::wallets($index->owner_id),
+        'value' => $index->wallet
+      ));
+    }
     // amount
     $fieldset->add('currency', array(
       'id' => 'write_amount',
