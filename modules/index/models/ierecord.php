@@ -224,6 +224,7 @@ class Model extends \Kotchasan\Model
     $ret = array();
     $model = new \Kotchasan\Model;
     $table_name = $model->getTableName('ierecord');
+    $wallet = $request->post('write_wallet_name')->topic();
     if ($index->id == 0) {
       // ตรวจสอบกระเป๋าเงินซ้ำ
       $search = $model->db()->createQuery()

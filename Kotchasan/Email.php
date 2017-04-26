@@ -19,6 +19,7 @@ use \Kotchasan\Language;
  */
 class Email extends \Kotchasan\Model
 {
+  protected $error;
 
   /**
    * ฟังก์ชั่นส่งเมล์แบบกำหนดรายละเอียดเอง
@@ -27,10 +28,14 @@ class Email extends \Kotchasan\Model
    * @param string $replyto ที่อยู่อีเมล์สำหรับการตอบกลับจดหมาย ถ้าระบุเป็นค่าว่างจะใช้ที่อยู่อีเมล์จาก noreply_email
    * @param string $subject หัวข้อจดหมาย
    * @param string $msg รายละเอียดของจดหมาย (รองรับ HTML)
-   * @return string สำเร็จคืนค่าว่าง ไม่สำเร็จ คืนค่าข้อความผิดพลาด
+   * @return \static
    */
   public static function send($mailto, $replyto, $subject, $msg)
   {
+    // create class
+    $obj = new static;
+    $obj->error = array();
+    // send email
     $charset = empty(self::$cfg->email_charset) ? 'utf-8' : strtolower(self::$cfg->email_charset);
     if (empty($replyto)) {
       $replyto = array(self::$cfg->noreply_email, strip_tags(self::$cfg->web_title));
@@ -45,7 +50,6 @@ class Email extends \Kotchasan\Model
       $replyto[1] = iconv('utf-8', $charset, $replyto[1]);
     }
     $msg = preg_replace(array('/<\?/', '/\?>/'), array('&lt;?', '?&gt;'), $msg);
-    $messages = array();
     if (empty(self::$cfg->email_use_phpMailer)) {
       // ส่งอีเมล์ด้วยฟังก์ชั่นของ PHP
       foreach (explode(',', $mailto) as $email) {
@@ -54,7 +58,7 @@ class Email extends \Kotchasan\Model
         $headers .= "From: ".strip_tags($replyto[1])."\r\n";
         $headers .= "Reply-to: $replyto[0]\r\n";
         if (!@mail($email, $subject, $msg, $headers)) {
-          $messages = array(Language::get('Unable to send mail'));
+          $obj->error['Unable to send mail'] = Language::get('Unable to send mail');
         }
       }
     } else {
@@ -109,11 +113,31 @@ class Email extends \Kotchasan\Model
           }
         }
         if (false === $mail->send()) {
-          $messages[$mail->ErrorInfo] = $mail->ErrorInfo;
+          $obj->error[$mail->ErrorInfo] = $mail->ErrorInfo;
         }
         $mail->clearAddresses();
       }
     }
-    return empty($messages) ? '' : implode("\n", $messages);
+    return $obj;
+  }
+
+  /**
+   * ตรวจสอบว่ามีข้อผิดพลาดในการส่งอีเมล์หรือไม่
+   *
+   * @return boolean คืนค่า true ถ้ามี error, false ถ้าส่งอีเมล์สำเร็จ
+   */
+  public function error()
+  {
+    return empty($this->error) ? false : true;
+  }
+
+  /**
+   * คืนค่าข้อผิดพลาดการส่งอีเมล์
+   *
+   * @return string ถ้าไม่มีข้อผิดพลาดคืนค่าข้อความว่าง
+   */
+  public function getErrorMessage()
+  {
+    return empty($this->error) ? '' : implode("\n", $this->error);
   }
 }

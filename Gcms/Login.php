@@ -132,14 +132,14 @@ class Login extends \Kotchasan\Login implements \Kotchasan\LoginInterface
         );
         // send mail
         $err = \Gcms\Email::send(3, 'member', $replace, $search->$field);
-        if (empty($err)) {
+        if (!$err->error()) {
           // อัปเดทรหัสผ่านใหม่
           $model->db()->update($table, (int)$search->id, array('password' => sha1($password.$search->$field)));
           // คืนค่า
           self::$login_message = Language::get('Your message was sent successfully');
           self::$request = $request->withQueryParams(array('action' => 'login'));
         } else {
-          self::$login_message = $err;
+          self::$login_message = $err->getErrorMessage();
         }
       }
     }
