@@ -25,6 +25,6 @@ define('DEBUG', 2);
  * false (default)
  * true บันทึกการ query ฐานข้อมูลลง log (ใช้เฉพาะตอนออกแบบเท่านั้น)
  */
-define('DB_LOG', false);
+define('DB_LOG', 0);
 // load Kotchasan
 include 'Kotchasan/load.php';

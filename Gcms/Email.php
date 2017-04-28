@@ -29,7 +29,7 @@ class Email extends \Kotchasan\Email
    * @param string $module ชื่อโมดูลของจดหมายที่ต้องการส่ง
    * @param array $datas ข้อมูลที่จะถูกแทนที่ลงในจดหมาย ในรูป 'ตัวแปร'=>'ข้อความ'
    * @param string $to ที่อยู่อีเมล์ผู้รับ  คั่นแต่ละรายชื่อด้วย ,
-   * @return string สำเร็จคืนค่าว่าง ไม่สำเร็จ คืนค่าข้อความผิดพลาด
+   * @return \static
    */
   public static function send($id, $module, $datas, $to)
   {
