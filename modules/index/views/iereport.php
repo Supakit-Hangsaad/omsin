@@ -41,7 +41,9 @@ class View extends \Gcms\View
       $datas[] = $item;
     }
     if (!empty($datas)) {
-      $currency_unit = Language::get('CURRENCY_UNITS')[self::$cfg->currency_unit];
+      // สกุลเงิน
+      $currency_units = Language::get('CURRENCY_UNITS');
+      $currency_unit = $currency_units[self::$cfg->currency_unit];
       $row = '<div class=dashboard>';
       $row .= '<section class=card><h3>{LNG_Yearly Report}</h3><div class=body>';
       foreach ($datas as $i => $item) {

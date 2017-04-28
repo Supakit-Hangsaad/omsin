@@ -112,12 +112,14 @@ class View extends \Gcms\View
       'label' => '{LNG_To}',
       'options' => $wallets
     ));
+    // สกุลเงิน
+    $currency_units = Language::get('CURRENCY_UNITS');
     // amount
     $fieldset->add('currency', array(
       'id' => 'write_amount',
       'itemClass' => 'item',
       'labelClass' => 'g-input icon-money',
-      'label' => '{LNG_Amount} ('.Language::get('CURRENCY_UNITS')[self::$cfg->currency_unit].')',
+      'label' => '{LNG_Amount} ('.$currency_units[self::$cfg->currency_unit].')',
     ));
     // create_date
     $fieldset->add('date', array(

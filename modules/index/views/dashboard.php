@@ -73,13 +73,15 @@ class View extends \Gcms\View
     $wallet[] = '<dd class=item><span class=label>{LNG_Total}</span><span class="bar total" style="width:'.($total == 0 ? '1px' : '100%').'"><span>'.Currency::format($total).' {UNIT}</span></span></dd>';
     // โหลด template
     $template = Template::create('', '', 'dashboard');
+    // สกุลเงิน
+    $currency_units = Language::get('CURRENCY_UNITS');
     $template->add(array(
       '/{RECEIPTS}/' => Currency::format($today['income']),
       '/{EXPENSES}/' => Currency::format($today['expense']),
       '/{ALLRECEIPTS}/' => Currency::format($total_income),
       '/{ALLEXPENSES}/' => Currency::format($total_expense),
       '/{WALLET}/' => implode('', $wallet),
-      '/{UNIT}/' => Language::get('CURRENCY_UNITS')[self::$cfg->currency_unit],
+      '/{UNIT}/' => $currency_units[self::$cfg->currency_unit],
     ));
     return $template->render();
   }
