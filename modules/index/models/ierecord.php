@@ -155,7 +155,11 @@ class Model extends \Kotchasan\Model
         $model->db()->insert($table_name, $save);
       } else {
         // แก้ไข
-        $model->db()->update($table_name, $index->id, $save);
+        $where = array(
+          array('owner_id', $index->owner_id),
+          array('id', $index->id)
+        );
+        $model->db()->update($table_name, $where, $save);
       }
       // save cookie
       setcookie('ierecord_wallet', $save['wallet'], time() + 3600 * 24 * 365, '/');
@@ -222,10 +226,13 @@ class Model extends \Kotchasan\Model
   private static function wallet(Request $request, $index)
   {
     $ret = array();
+    // Model
     $model = new \Kotchasan\Model;
+    // ตาราง ierecord
     $table_name = $model->getTableName('ierecord');
-    $wallet = $request->post('write_wallet_name')->topic();
     if ($index->id == 0) {
+      // ชื่อ กระเป๋าเงิน
+      $wallet = $request->post('write_wallet_name')->topic();
       // ตรวจสอบกระเป๋าเงินซ้ำ
       $search = $model->db()->createQuery()
         ->from('category')
@@ -276,7 +283,11 @@ class Model extends \Kotchasan\Model
       }
     } else {
       // แก้ไขรายการ ยอดยกมา
-      $model->db()->update($table_name, $index->id, array(
+      $where = array(
+        array('owner_id', $index->owner_id),
+        array('id', $index->id)
+      );
+      $model->db()->update($table_name, $where, array(
         'comment' => $request->post('write_comment')->topic(),
         'create_date' => $request->post('write_create_date')->date(),
         'income' => $request->post('write_amount')->toDouble(),
