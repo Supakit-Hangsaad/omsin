@@ -425,10 +425,9 @@ abstract class Driver extends Query
    *
    * @param string $table_name ชื่อตาราง
    * @param array|object $save ข้อมูลที่ต้องการบันทึก รูปแบบ array('key1'=>'value1', 'key2'=>'value2', ...)
-   * @param array|object $update ข้อมูลหากเป็นการอัปเดท, ไม่ต้องระบุหากเป็นการใช้ค่าเดิม
    * @return int|null insert คืนค่า id ที่เพิ่ม, update คืนค่า 0, ผิดพลาด คืนค่า null
    */
-  abstract public function insertOrUpdate($table_name, $save, $update = array());
+  abstract public function insertOrUpdate($table_name, $save);
 
   /**
    * เลือกฐานข้อมูล.

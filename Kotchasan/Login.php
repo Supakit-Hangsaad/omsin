@@ -103,6 +103,9 @@ class Login extends \Kotchasan\KBase implements LoginInterface
     } elseif (self::$request->post('action')->toString() === 'forgot') {
       // ตรวจสอบอีเมล์สำหรับการขอรหัสผ่านใหม่
       return $login->forgot(self::$request);
+    } elseif (!$login->from_submit && isset($_SESSION['login']) && is_array($_SESSION['login'])) {
+      // login อยู่แล้ว
+      return $login;
     } else {
       // ตรวจสอบค่าที่ส่งมา
       if (self::$text_username == '') {
@@ -208,7 +211,7 @@ class Login extends \Kotchasan\KBase implements LoginInterface
    */
   public static function isMember()
   {
-    return isset($_SESSION['login']) ? $_SESSION['login'] : null;
+    return empty($_SESSION['login']) ? null : $_SESSION['login'];
   }
 
   /**

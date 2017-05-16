@@ -168,6 +168,10 @@ ul.list-style-none {
 .wrap {
   white-space: normal;
 }
+.border {
+  border-width: 1px;
+  border-style: solid;
+}
 /* Font Style */
 del {
   text-decoration: line-through;
@@ -1119,6 +1123,10 @@ form .comment {
   max-height: 200px;
   max-width: 200px;
 }
+.radiogroups, .checkboxgroups {
+  display: block;
+  overflow: hidden;
+}
 .radiogroups > label, .checkboxgroups > label {
   padding: 0.25em 1em 0.25em 0.25em;
   cursor: pointer;
@@ -1130,11 +1138,6 @@ form .comment {
 }
 .radiogroups > label > input, .checkboxgroups > label > input {
   height: 1.65em;
-}
-.radiogroups, .checkboxgroups {
-  border-width: 1px;
-  border-style: solid;
-  display: block;
 }
 .radiogroups > label:hover, .checkboxgroups > label:hover {
   background-color: #3297FD;
@@ -2631,10 +2634,6 @@ body .tooltip-bottom {
   border-color: rgba(0,0,0,0.1);
   border-spacing: 0;
   border-collapse: collapse;
-}
-.table.border, table.border {
-  border-width: 1px;
-  border-style: solid;
 }
 .table.center, table.center {
   margin-left: auto;

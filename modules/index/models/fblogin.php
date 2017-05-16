@@ -64,14 +64,14 @@ class Model extends \Kotchasan\Model
         $ret['isMember'] = 0;
       }
       if (is_array($save)) {
+        // clear
+        $request->removeToken();
         // login
         $save['password'] = $password;
         $_SESSION['login'] = $save;
         // คืนค่า
         $ret['isMember'] = 1;
         $ret['alert'] = Language::replace('Welcome %s, login complete', array('%s' => $save['name']));
-        // clear
-        $request->removeToken();
       }
       // คืนค่าเป็น json
       echo json_encode($ret);

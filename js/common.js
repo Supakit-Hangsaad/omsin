@@ -268,7 +268,7 @@ var integerOnly = function (e) {
 var currencyOnly = function (e) {
   return _doCheckKey(this, e, /[0-9\.]/);
 };
-function contryChanged(prefix) {
+function countryChanged(prefix) {
   var _contryChanged = function () {
     if (this.value != 'TH') {
       $G($E(prefix + '_provinceID').parentNode.parentNode).addClass('hidden');

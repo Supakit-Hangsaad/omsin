@@ -93,7 +93,7 @@ class Sql
   /**
    * ใส่ `` ครอบชื่อคอลัมน์
    * ชื่อคอลัมน์ต้องเป็น ภาษาอังกฤษ ตัวเลข และ _ เท่านั้น
-   * ถ้ามีอักขระอื่นนอกจากนี้ คืนค่า ข้อความที่ส่งมา
+   * ถ้ามีอักขระอื่นนอกจากนี้ คืนค่า ข้อความที่ส่งมา ครอบด้วย ''
    *
    * @param string $column_name
    * @return string
@@ -104,7 +104,10 @@ class Sql
    * @assert (field_name) [==] '`field_name`'
    * @assert ('table_name.field_name') [==] '`table_name`.`field_name`'
    * @assert ('`table_name`.`field_name`') [==] '`table_name`.`field_name`'
-   * @assert ('DATE(day)') [throws] InvalidArgumentException
+   * @assert ('0x64656') [==] "'0x64656'"
+   * @assert ('DATE(day)') [==] "'DATE(day)'"
+   * @assert ('DROP table') [==] "'DROP table'"
+   * @assert (array()) [throws] InvalidArgumentException
    */
   public static function fieldName($column_name)
   {
@@ -114,12 +117,15 @@ class Sql
       // ตัวเลขเท่านั้น
       return $column_name;
     } elseif (is_string($column_name)) {
-      if (preg_match('/^([A-Z0-9]{1,2}\.)?`?([a-zA-Z0-9_]+)`?$/', $column_name, $match)) {
+      if (preg_match('/^([A-Z0-9]{1,2}\.)?`?((?!0x)[a-zA-Z0-9_]+)`?$/', $column_name, $match)) {
         // U.id, U1.id, field_name
         return "$match[1]`$match[2]`";
       } elseif (preg_match('/^`?([a-zA-Z0-9_]+)`?\.`?([a-zA-Z0-9_]+)`?$/', $column_name, $match)) {
         // table_name.field_name
         return "`$match[1]`.`$match[2]`";
+      } else {
+        // อื่นๆ คืนค่าเป็นข้อความภายใต้เครื่องหมาย ''
+        return "'$column_name'";
       }
     }
     throw new \InvalidArgumentException('Invalid arguments in fieldName');
@@ -224,7 +230,9 @@ class Sql
    * @assert ('id', null) [==] 'NULL'
    * @assert ('id', 'U.id') [==] "U.`id`"
    * @assert ('id', 'U.`id`') [==] 'U.`id`'
-   * @assert ('id', 'table_name.id') [==] "`table_name`.`id`"
+   * @assert ('id', 'domain.tld') [==] "'domain.tld'"
+   * @assert ('id', 'table_name.`id`') [==] '`table_name`.`id`'
+   * @assert ('id', '`table_name`.id') [==] '`table_name`.`id`'
    * @assert ('id', '`table_name`.`id`') [==] '`table_name`.`id`'
    * @assert ('id', 'INSERT INTO') [==] ':id0'
    * @assert ('id', array(1, '2', null)) [==] "(1, '2', NULL)"
@@ -254,10 +262,13 @@ class Sql
         $sql = ':'.strtolower(preg_replace('/[`\.\s\-_]+/', '', $column_name)).sizeof($values);
         $values[$sql] = $value;
       } else {
-        if (preg_match('/^(([A-Z0-9]{1,2})|`?([a-zA-Z0-9_]+)`?)\.`?([a-zA-Z0-9_]+)`?$/', $value, $match)) {
-          // U.id U.`id` U1.id U1.`id` table_name.module_id `table_name`.`module_id`
+        if (preg_match('/^(([A-Z0-9]{1,2})|`([a-zA-Z0-9_]+)`)\.`?([a-zA-Z0-9_]+)`?$/', $value, $match)) {
+          // U.id U.`id` U1.id U1.`id`  `table_name`.`module_id`
           $sql = $match[3] == '' ? "$match[2].`$match[4]`" : "`$match[3]`.`$match[4]`";
-        } elseif (!preg_match('/[\s\r\n\t`;\(\)\*\=<>\/\'"]+/s', $value) && !preg_match('/(UNION|INSERT|DELETE|DROP|0x[0-9]+)/is', $value)) {
+        } elseif (preg_match('/^([a-zA-Z0-9_]+)\.`([a-zA-Z0-9_]+)`$/', $value, $match)) {
+          // table_name.`module_id`
+          $sql = "`$match[1]`.`$match[2]`";
+        } elseif (!preg_match('/[\s\r\n\t`;\(\)\*\=<>\/\'"]+/s', $value) && !preg_match('/(UNION|INSERT|DELETE|TRUNCATE|DROP|0x[0-9]+)/is', $value)) {
           // ข้อความที่ไม่มีช่องว่างหรือรหัสที่อาจเป็น SQL
           $sql = "'$value'";
         } else {
@@ -466,6 +477,22 @@ class Sql
   public static function DATE_FORMAT($column_name, $format, $alias = null)
   {
     return self::create("DATE_FORMAT(".self::fieldName($column_name).", '$format')".($alias ? " AS `$alias`" : ''));
+  }
+
+  /**
+   * หาความแตกต่างระหว่างวัน (คืนค่าเป็นจำนวนวันที่แตกต่างกัน)
+   *
+   * @param string $column_name1
+   * @param string $column_name2
+   * @param string $alias
+   * @return \static
+   *
+   * @assert ('create_date', Sql::NOW())->text() [==] "DATEDIFF(`create_date`, NOW())"
+   * @assert ('2017-04-04', 'create_date')->text() [==] "DATEDIFF('2017-04-04', `create_date`)"
+   */
+  public static function DATEDIFF($column_name1, $column_name2, $alias = null)
+  {
+    return self::create("DATEDIFF(".self::fieldName($column_name1).", ".self::fieldName($column_name2).")".($alias ? " AS `$alias`" : ''));
   }
 
   /**

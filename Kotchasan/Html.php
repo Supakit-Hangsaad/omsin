@@ -78,6 +78,164 @@ class Html extends \Kotchasan\KBase
     return $obj;
   }
 
+  private function addGroups($tag, $attributes)
+  {
+    $prop = array('class' => isset($attributes['class']) ? $attributes['class'] : 'item');
+    if (isset($attributes['id'])) {
+      $prop['id'] = $attributes['id'];
+    }
+    if (isset($attributes['label'])) {
+      if (isset($attributes['for'])) {
+        $item = new static('div', $prop);
+        $item->add('label', array(
+          'innerHTML' => $attributes['label'],
+          'for' => $attributes['for']
+        ));
+      } else {
+        $prop['title'] = $attributes['label'];
+        $item = self::fieldset($prop);
+      }
+    } else {
+      $item = new static('div', $prop);
+    }
+    $this->rows[] = $item;
+    $obj = $item->add('div', array('class' => 'input-'.$tag));
+    $rows = array();
+    $comment = array();
+    if (empty($attributes['id'])) {
+      $id = '';
+      $name = '';
+    } else {
+      $id = ' id='.$attributes['id'];
+      $name = ' name='.$attributes['id'].'[]';
+      $comment['id'] = 'result_'.$attributes['id'];
+    }
+    foreach ($attributes as $key => $value) {
+      if ($key == 'comment') {
+        $comment['class'] = 'comment';
+        $comment['innerHTML'] = $value;
+      } elseif ($key == 'checkbox' || $key == 'radio') {
+        foreach ($value as $v => $text) {
+          $chk = isset($attributes['value']) && in_array($v, $attributes['value']) ? ' checked' : '';
+          $rows[] = '<label>'.$text.'&nbsp;<input type='.$key.$id.$name.$chk.' value="'.$v.'"></label>';
+          $id = '';
+        }
+      }
+    }
+    if (!empty($rows)) {
+      $obj->appendChild(implode('&nbsp; ', $rows));
+    }
+    if (isset($attributes['comment'])) {
+      $item->add('div', $comment);
+    }
+    return $obj;
+  }
+
+  private function addRadioOrCheckbox($tag, $attributes)
+  {
+    $prop = array('class' => 'item');
+    if (!empty($attributes['itemId'])) {
+      $prop['id'] = $attributes['itemId'];
+    }
+    $obj = new static('div', $prop);
+    $this->rows[] = $obj;
+    if (isset($attributes['name'])) {
+      $name = $attributes['name'];
+    } elseif (isset($attributes['id'])) {
+      $name = $tag == 'checkboxgroups' ? $attributes['id'].'[]' : $attributes['id'];
+    } else {
+      $name = false;
+    }
+    $c = array($tag);
+    if (isset($attributes['labelClass'])) {
+      $c[] = $attributes['labelClass'];
+    }
+    if (!empty($attributes['multiline'])) {
+      $c[] = 'multiline';
+    }
+    if (isset($attributes['label']) && isset($attributes['id'])) {
+      $obj->add('label', array(
+        'innerHTML' => $attributes['label'],
+        'for' => $attributes['id']
+      ));
+      $c[] = 'border';
+    }
+    $div = $obj->add('div', array(
+      'class' => implode(' ', $c)
+    ));
+    if (!empty($attributes['options']) && is_array($attributes['options'])) {
+      foreach ($attributes['options'] as $v => $label) {
+        if (isset($attributes['value'])) {
+          if (is_array($attributes['value'])) {
+            $checked = isset($attributes['value']) && in_array($v, $attributes['value']);
+          } else {
+            $checked = isset($attributes['value']) && $v == $attributes['value'];
+          }
+        } else {
+          $checked = false;
+        }
+        $item = array(
+          'label' => $label,
+          'value' => $v,
+          'checked' => $checked
+        );
+        if ($name) {
+          $item['name'] = $name;
+        }
+        if (isset($attributes['id'])) {
+          $item['id'] = $attributes['id'];
+          $result_id = $attributes['id'];
+          unset($attributes['id']);
+        }
+        if (isset($attributes['comment'])) {
+          $item['title'] = $attributes['comment'];
+        }
+        $div->add($tag == 'radiogroups' ? 'radio' : 'checkbox', $item);
+      }
+    }
+    if (!empty($attributes['comment'])) {
+      $obj->add('div', array(
+        'id' => 'result_'.$result_id,
+        'class' => 'comment',
+        'innerHTML' => $attributes['comment']
+      ));
+    }
+    return $obj;
+  }
+
+  private function addAntispam($tag, $attributes)
+  {
+    $antispam = new Antispam();
+    $attributes['antispamid'] = $antispam->getId();
+    if (isset($attributes['value']) && $attributes['value'] === true) {
+      $attributes['value'] = $antispam->getValue();
+    }
+    $obj = self::create($tag, $attributes);
+    $this->rows[] = $obj;
+    $this->rows[] = self::create('hidden', array(
+        'id' => $attributes['id'].'id',
+        'value' => $attributes['antispamid']
+    ));
+    return $obj;
+  }
+
+  private function addCKEditor($tag, $attributes)
+  {
+    if (isset($attributes[$tag])) {
+      $tag = $attributes[$tag];
+      unset($attributes[$tag]);
+    } else {
+      $tag = 'textarea';
+    }
+    if (class_exists('Kotchasan\CKEditor')) {
+      $obj = new \Kotchasan\CKEditor($tag, $attributes);
+    } else {
+      $obj = self::create($tag, $attributes);
+    }
+    $this->rows[] = $obj;
+    return $obj;
+  }
+
   /**
    * แทรก tag ลงใน element เหมือนการใช้งาน innerHTML
    *
@@ -89,54 +247,13 @@ class Html extends \Kotchasan\KBase
   {
     $tag = strtolower($tag);
     if ($tag == 'groups' || $tag == 'groups-table') {
-      $prop = array('class' => isset($attributes['class']) ? $attributes['class'] : 'item');
-      if (isset($attributes['id'])) {
-        $prop['id'] = $attributes['id'];
-      }
-      if (isset($attributes['label'])) {
-        if (isset($attributes['for'])) {
-          $item = new static('div', $prop);
-          $item->add('label', array(
-            'innerHTML' => $attributes['label'],
-            'for' => $attributes['for']
-          ));
-        } else {
-          $prop['title'] = $attributes['label'];
-          $item = self::fieldset($prop);
-        }
-      } else {
-        $item = new static('div', $prop);
-      }
-      $this->rows[] = $item;
-      $obj = $item->add('div', array('class' => 'input-'.$tag));
-      $rows = array();
-      $comment = array();
-      if (empty($attributes['id'])) {
-        $id = '';
-        $name = '';
-      } else {
-        $id = ' id='.$attributes['id'];
-        $name = ' name='.$attributes['id'].'[]';
-        $comment['id'] = 'result_'.$attributes['id'];
-      }
-      foreach ($attributes as $key => $value) {
-        if ($key == 'comment') {
-          $comment['class'] = 'comment';
-          $comment['innerHTML'] = $value;
-        } elseif ($key == 'checkbox' || $key == 'radio') {
-          foreach ($value as $v => $text) {
-            $chk = isset($attributes['value']) && in_array($v, $attributes['value']) ? ' checked' : '';
-            $rows[] = '<label>'.$text.'&nbsp;<input type='.$key.$id.$name.$chk.' value="'.$v.'"></label>';
-            $id = '';
-          }
-        }
-      }
-      if (!empty($rows)) {
-        $obj->appendChild(implode('&nbsp; ', $rows));
-      }
-      if (isset($attributes['comment'])) {
-        $item->add('div', $comment);
-      }
+      $obj = $this->addGroups($tag, $attributes);
+    } elseif ($tag == 'radiogroups' || $tag == 'checkboxgroups') {
+      $obj = self::addRadioOrCheckbox($tag, $attributes);
+    } elseif ($tag == 'antispam') {
+      $obj = self::addAntispam($tag, $attributes);
+    } elseif ($tag == 'ckeditor') {
+      $obj = self::addCKEditor($tag, $attributes);
     } elseif ($tag == 'row') {
       $obj = new static('div', array(
         'class' => 'row'
@@ -146,91 +263,6 @@ class Html extends \Kotchasan\KBase
       $obj = new static('div', array(
         'class' => 'rowgroup'
       ));
-      $this->rows[] = $obj;
-    } elseif ($tag == 'radiogroups' || $tag == 'checkboxgroups') {
-      $prop = array('class' => 'item');
-      if (!empty($attributes['itemId'])) {
-        $prop['id'] = $attributes['itemId'];
-      }
-      $obj = new static('div', $prop);
-      $this->rows[] = $obj;
-      if (isset($attributes['name'])) {
-        $name = $attributes['name'];
-      } elseif (isset($attributes['id'])) {
-        $name = $tag == 'checkboxgroups' ? $attributes['id'].'[]' : $attributes['id'];
-      } else {
-        $name = false;
-      }
-      if (isset($attributes['label']) && isset($attributes['id'])) {
-        $obj->add('label', array(
-          'innerHTML' => $attributes['label'],
-          'for' => $attributes['id']
-        ));
-      }
-      $div = $obj->add('div', array(
-        'class' => $tag.(isset($attributes['labelClass']) ? ' '.$attributes['labelClass'] : '').(empty($attributes['multiline']) ? '' : ' multiline')
-      ));
-      if (!empty($attributes['options']) && is_array($attributes['options'])) {
-        foreach ($attributes['options'] as $v => $label) {
-          if (isset($attributes['value'])) {
-            if (is_array($attributes['value'])) {
-              $checked = isset($attributes['value']) && in_array($v, $attributes['value']);
-            } else {
-              $checked = isset($attributes['value']) && $v == $attributes['value'];
-            }
-          } else {
-            $checked = false;
-          }
-          $item = array(
-            'label' => $label,
-            'value' => $v,
-            'checked' => $checked
-          );
-          if ($name) {
-            $item['name'] = $name;
-          }
-          if (isset($attributes['id'])) {
-            $item['id'] = $attributes['id'];
-            $result_id = $attributes['id'];
-            unset($attributes['id']);
-          }
-          if (isset($attributes['comment'])) {
-            $item['title'] = $attributes['comment'];
-          }
-          $div->add($tag == 'radiogroups' ? 'radio' : 'checkbox', $item);
-        }
-      }
-      if (!empty($attributes['comment'])) {
-        $obj->add('div', array(
-          'id' => 'result_'.$result_id,
-          'class' => 'comment',
-          'innerHTML' => $attributes['comment']
-        ));
-      }
-    } elseif ($tag == 'antispam') {
-      $antispam = new Antispam();
-      $attributes['antispamid'] = $antispam->getId();
-      if (isset($attributes['value']) && $attributes['value'] === true) {
-        $attributes['value'] = $antispam->getValue();
-      }
-      $obj = self::create($tag, $attributes);
-      $this->rows[] = $obj;
-      $this->rows[] = self::create('hidden', array(
-          'id' => $attributes['id'].'id',
-          'value' => $attributes['antispamid']
-      ));
-    } elseif ($tag == 'ckeditor') {
-      if (isset($attributes[$tag])) {
-        $tag = $attributes[$tag];
-        unset($attributes[$tag]);
-      } else {
-        $tag = 'textarea';
-      }
-      if (class_exists('Kotchasan\CKEditor')) {
-        $obj = new \Kotchasan\CKEditor($tag, $attributes);
-      } else {
-        $obj = self::create($tag, $attributes);
-      }
       $this->rows[] = $obj;
     } else {
       $obj = self::create($tag, $attributes);

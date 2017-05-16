@@ -90,6 +90,7 @@ class Form extends \Kotchasan\KBase
         case 'antispamid':
         case 'text':
         case 'validator':
+        case 'result':
           $$k = $v;
           break;
         case 'result':
@@ -192,6 +193,9 @@ class Form extends \Kotchasan\KBase
     }
     if (isset($dataPreview)) {
       $prop['data-preview'] = 'data-preview="'.$dataPreview.'"';
+    }
+    if (isset($result)) {
+      $prop['data-result'] = 'data-result="result_'.$result.'"';
     }
     if (isset($accept) && is_array($accept)) {
       $prop['accept'] = 'accept="'.Mime::getEccept($accept).'"';

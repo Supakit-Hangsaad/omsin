@@ -635,6 +635,7 @@ class QueryBuilder extends \Kotchasan\Database\Query
    * @assert where(1)->text() [==] " WHERE `id` = 1"
    * @assert where(array('id', 1))->text() [==] " WHERE `id` = 1"
    * @assert where(array('id', '1'))->text() [==] " WHERE `id` = '1'"
+   * @assert where(array('domain', 'domain.tld'))->text() [==] " WHERE `domain` = 'domain.tld'"
    * @assert where(array(1, 1))->text() [==] " WHERE 1 = 1"
    * @assert where(array('U.id', 'G.id'))->text() [==] " WHERE U.`id` = G.`id`"
    * @assert where(array('date', '2016-1-1 30:30'))->text() [==] " WHERE `date` = '2016-1-1 30:30'"
