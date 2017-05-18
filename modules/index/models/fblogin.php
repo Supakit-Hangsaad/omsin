@@ -43,6 +43,7 @@ class Model extends \Kotchasan\Model
         ->toArray()
         ->first('id', 'username', 'name', 'visited', 'fb', 'status');
       if ($search === false) {
+        // ยังไม่เคยลงทะเบียน, ลงทะเบียนใหม่
         $save['status'] = 0;
         $save['fb'] = 1;
         $save['visited'] = 0;
@@ -57,7 +58,8 @@ class Model extends \Kotchasan\Model
         $save['lastvisited'] = time();
         $save['ip'] = $request->getClientIp();
         $save['password'] = sha1($password.$search['username']);
-        $db->update($user_table, $save['id'], $save);
+        // อัปเดท
+        $db->update($user_table, $search['id'], $save);
       } else {
         // ไม่สามารถ login ได้ เนื่องจากมี email อยู่ก่อนแล้ว
         $save = false;
