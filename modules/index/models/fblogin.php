@@ -41,7 +41,7 @@ class Model extends \Kotchasan\Model
         ->from('user')
         ->where(array('username', $save['username']))
         ->toArray()
-        ->first('id', 'username', 'visited', 'fb');
+        ->first('id', 'username', 'name', 'visited', 'fb', 'status');
       if ($search === false) {
         $save['status'] = 0;
         $save['fb'] = 1;
@@ -49,14 +49,15 @@ class Model extends \Kotchasan\Model
         $save['password'] = sha1($password.$save['username']);
         $save['lastvisited'] = time();
         $save['create_date'] = time();
-        $db->insert($user_table, $save);
+        $save['id'] = $db->insert($user_table, $save);
       } elseif ($search['fb'] == 1) {
         // facebook เคยเยี่ยมชมแล้ว อัปเดทการเยี่ยมชม
-        $save['visited'] = $search['visited'] + 1;
+        $save = $search;
+        $save['visited'] ++;
         $save['lastvisited'] = time();
         $save['ip'] = $request->getClientIp();
         $save['password'] = sha1($password.$search['username']);
-        $db->update($user_table, $search['id'], $save);
+        $db->update($user_table, $save['id'], $save);
       } else {
         // ไม่สามารถ login ได้ เนื่องจากมี email อยู่ก่อนแล้ว
         $save = false;
