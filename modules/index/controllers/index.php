@@ -15,7 +15,7 @@ use \Gcms\Gcms;
 use \Kotchasan\Http\Response;
 
 /**
- * Controller หลัก สำหรับแสดง backend ของ GCMS
+ * Controller หลัก สำหรับแสดง backend
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *

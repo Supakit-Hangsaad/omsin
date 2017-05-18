@@ -92,7 +92,7 @@ var dataTableActionCallback = function (xhr) {
   }
 };
 var initWeb = function () {
-  loader = new GLoader(WEB_URL + 'loader.php/index/controller/loader/index', getURL, function (xhr) {
+  loader = new GLoader(WEB_URL + 'loader.php/index/controller/loader/index', function (xhr) {
     var scroll_to = 'scroll-to';
     var content = $G('content');
     var datas = xhr.responseText.toJSON();

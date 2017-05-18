@@ -33,15 +33,15 @@ class Login extends \Kotchasan\Login implements \Kotchasan\LoginInterface
   {
     $where = array();
     foreach (self::$cfg->login_fields as $field) {
-      $where[] = array('U.'.$field, $username);
+      $where[] = array($field, $username);
     }
     // model
     $model = new Model;
     $query = $model->db()->createQuery()
-      ->select('U.*')
-      ->from('user U')
+      ->select()
+      ->from('user')
       ->where($where, 'OR')
-      ->order('status ASC')
+      ->order('status DESC')
       ->toArray();
     $login_result = null;
     foreach ($query->execute() as $item) {

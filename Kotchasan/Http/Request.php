@@ -428,7 +428,7 @@ class Request extends AbstractRequest implements RequestInterface
    */
   public function isReferer()
   {
-    $host = empty($_SERVER["HTTP_HOST"]) ? $_SERVER["SERVER_NAME"] : $_SERVER["HTTP_HOST"];
+    $host = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] : $_SERVER['HTTP_HOST'];
     $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
     if (preg_match("/$host/ui", $referer)) {
       return true;

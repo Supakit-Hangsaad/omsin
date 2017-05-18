@@ -354,7 +354,7 @@ class Html extends \Kotchasan\KBase
       self::$form->rows = $form_inputs;
     }
     if ($token) {
-      self::$form->rows[] = '<input type="hidden" name="token" value="'.self::$request->createToken().'">';
+      self::$form->rows[] = '<input type="hidden" name="token" id="token" value="'.self::$request->createToken().'">';
     }
     if (isset($script)) {
       self::$form->javascript[] = $script;

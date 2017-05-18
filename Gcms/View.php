@@ -9,7 +9,7 @@
 namespace Gcms;
 
 /**
- * View base class สำหรับส่วนแอดมินของ GCMS.
+ * View base class สำหรับ GCMS.
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *

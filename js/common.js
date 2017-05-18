@@ -283,41 +283,6 @@ function countryChanged(prefix) {
     _contryChanged.call($E(prefix + '_country'));
   }
 }
-var getURL = function (url) {
-  var loader_patt0 = /.*?module=.*?/,
-    loader_patt1 = new RegExp('^' + WEB_URL + '([a-z0-9]+)/([0-9]+)/([0-9]+)/(.*).html$'),
-    loader_patt2 = new RegExp('^' + WEB_URL + '([a-z0-9]+)/([0-9]+)/(.*).html$'),
-    loader_patt3 = new RegExp('^' + WEB_URL + '([a-z0-9]+)/([0-9]+).html$'),
-    loader_patt4 = new RegExp('^' + WEB_URL + '([a-z0-9]+)/(.*).html$'),
-    loader_patt5 = new RegExp('^' + WEB_URL + '(.*).html$'),
-    p1 = /module=(.*)?/,
-    urls = url.replace(/&amp;/g, '&').split('?'),
-    new_q = new Array();
-  if (urls[1] && loader_patt0.exec(urls[1])) {
-    new_q.push(urls[1]);
-    return new_q;
-  } else if (hs = loader_patt1.exec(urls[0])) {
-    new_q.push('module=' + hs[1] + '&cat=' + hs[2] + '&id=' + hs[3]);
-  } else if (hs = loader_patt2.exec(urls[0])) {
-    new_q.push('module=' + hs[1] + '&cat=' + hs[2] + '&alias=' + hs[3]);
-  } else if (hs = loader_patt3.exec(urls[0])) {
-    new_q.push('module=' + hs[1] + '&cat=' + hs[2]);
-  } else if (hs = loader_patt4.exec(urls[0])) {
-    new_q.push('module=' + hs[1] + '&alias=' + hs[2]);
-  } else if (hs = loader_patt5.exec(urls[0])) {
-    new_q.push('module=' + hs[1]);
-  } else {
-    return null;
-  }
-  if (urls[1]) {
-    forEach(urls[1].split('&'), function (q) {
-      if (q != 'action=logout' && q != 'action=login' && !p1.test(q)) {
-        new_q.push(q);
-      }
-    });
-  }
-  return new_q;
-};
 function selectMenu(module) {
   if ($E('topmenu')) {
     var tmp = false;
