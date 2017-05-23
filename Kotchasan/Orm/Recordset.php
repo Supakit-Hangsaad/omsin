@@ -449,7 +449,7 @@ class Recordset extends Query implements \Iterator
   /**
    * สร้าง query จาก config
    *
-   * @param string $func
+   * @param string $method
    * @param mixed $param
    */
   private function buildQuery($method, $param)
