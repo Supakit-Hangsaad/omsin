@@ -193,7 +193,7 @@ class Html extends \Kotchasan\KBase
         $div->add($tag == 'radiogroups' ? 'radio' : 'checkbox', $item);
       }
     }
-    if (!empty($attributes['comment'])) {
+    if (isset($result_id) && !empty($attributes['comment'])) {
       $obj->add('div', array(
         'id' => 'result_'.$result_id,
         'class' => 'comment',

@@ -104,24 +104,31 @@ class Sql
    * @assert (field_name) [==] '`field_name`'
    * @assert ('table_name.field_name') [==] '`table_name`.`field_name`'
    * @assert ('`table_name`.`field_name`') [==] '`table_name`.`field_name`'
-   * @assert ('0x64656') [==] "'0x64656'"
+   * @assert ('table_name.`field_name`') [==] '`table_name`.`field_name`'
+   * @assert ('`table_name`.field_name') [==] '`table_name`.`field_name`'
+   * @assert ('0x64656') [==] "`0x64656`"
+   * @assert (0x64656) [==] 411222
    * @assert ('DATE(day)') [==] "'DATE(day)'"
    * @assert ('DROP table') [==] "'DROP table'"
    * @assert (array()) [throws] InvalidArgumentException
    */
   public static function fieldName($column_name)
   {
-    if ($column_name instanceof self) {
-      return $column_name->text();
-    } elseif (is_numeric($column_name)) {
+    if (is_numeric($column_name)) {
       // ตัวเลขเท่านั้น
       return $column_name;
+    } elseif ($column_name instanceof self) {
+      // Sql
+      return $column_name->text();
+    } elseif ($column_name instanceof QueryBuilder) {
+      // QueryBuilder
+      return '('.$column_name->text().')';
     } elseif (is_string($column_name)) {
-      if (preg_match('/^([A-Z0-9]{1,2}\.)?`?((?!0x)[a-zA-Z0-9_]+)`?$/', $column_name, $match)) {
-        // U.id, U1.id, field_name
-        return "$match[1]`$match[2]`";
+      if (preg_match('/^(([A-Z0-9]{1,2})\.)?`?([a-zA-Z0-9_]+)`?$/', $column_name, $match)) {
+        // U.id, U.`id`, U1.id, U1.`id`, field_name, `field_name`
+        return $match[2] == '' ? "`$match[3]`" : "$match[2].`$match[3]`";
       } elseif (preg_match('/^`?([a-zA-Z0-9_]+)`?\.`?([a-zA-Z0-9_]+)`?$/', $column_name, $match)) {
-        // table_name.field_name
+        // table_name.field_name, table_name.`field_name`, `table_name`.field_name, `table_name`.`field_name`
         return "`$match[1]`.`$match[2]`";
       } else {
         // อื่นๆ คืนค่าเป็นข้อความภายใต้เครื่องหมาย ''
@@ -144,6 +151,7 @@ class Sql
    * @assert WHERE(0.1)->text() [==] "`id` = 0.1"
    * @assert WHERE('ทดสอบ')->text() [==] "`id` = 'ทดสอบ'"
    * @assert WHERE(null)->text() [==] "`id` = NULL"
+   * @assert WHERE(0x64656)->text() [==] "`id` = 411222"
    * @assert WHERE('SELECT * FROM')->text() [==] "`id` = :id0"
    * @assert WHERE(Sql::create('EXISTS SELECT FROM WHERE'))->text() [==] "EXISTS SELECT FROM WHERE"
    * @assert WHERE(array('id', '=', 1))->text() [==] "`id` = 1"
@@ -237,6 +245,7 @@ class Sql
    * @assert ('id', 'INSERT INTO') [==] ':id0'
    * @assert ('id', array(1, '2', null)) [==] "(1, '2', NULL)"
    * @assert ('id', '0x64656') [==] ':id0'
+   * @assert ('id', 0x64656) [==] 411222
    * @assert ('`table_name`.`id`', '0x64656') [==] ':tablenameid0'
    * @assert ('U1.`id`', '0x64656') [==] ':u1id0'
    * @assert ('U.id', '0x64656') [==] ':uid0'
@@ -277,7 +286,7 @@ class Sql
         }
       }
     } elseif (is_numeric($value)) {
-      // ตัวเลข
+      // ตัวเลขเท่านั้น
       $sql = $value;
     } elseif ($value instanceof self) {
       // Sql
@@ -335,7 +344,7 @@ class Sql
    * @return \static
    *
    * @assert ('id')->text() [==] 'SUM(`id`)'
-   * @assert ('table_name.id', 'id')->text() [==] 'SUM(`table_name`.`id`) AS `id`'
+   * @assert ('table_name.`id`', 'id')->text() [==] 'SUM(`table_name`.`id`) AS `id`'
    * @assert ('U.id', 'id', true)->text() [==] 'SUM(DISTINCT U.`id`) AS `id`'
    * @assert ('U1.id', 'id', true)->text() [==] 'SUM(DISTINCT U1.`id`) AS `id`'
    */
@@ -564,14 +573,14 @@ class Sql
   /**
    * สร้างคำสั่ง GROUP_CONCAT
    * @param string $column_name
-   * @param string $separator ข้อความเชื่อมฟิลด์เข้าด้วยกัน ค่าเริมต้นคือ ,
    * @param string|null $alias ชื่อรองที่ต้องการ ถ้าไม่ระบุไม่มีชื่อรอง
+   * @param string $separator ข้อความเชื่อมฟิลด์เข้าด้วยกัน ค่าเริมต้นคือ ,
    * @param boolean $distinct false (default) คืนค่ารายการที่ไม่ซ้ำ
    * @return \self
    *
-   * @assert ('C.topic', ', ', 'topic')->text() [==] "GROUP_CONCAT(C.`topic` SEPARATOR ', ') AS `topic`"
+   * @assert ('C.topic', 'topic', ', ')->text() [==] "GROUP_CONCAT(C.`topic` SEPARATOR ', ') AS `topic`"
    */
-  public static function GROUP_CONCAT($column_name, $separator = ',', $alias = null, $distinct = false, $order = null)
+  public static function GROUP_CONCAT($column_name, $alias = null, $separator = ',', $distinct = false, $order = null)
   {
     return self::create('GROUP_CONCAT('.($distinct ? 'DISTINCT ' : '').self::fieldName($column_name)." SEPARATOR '$separator')".($alias ? " AS `$alias`" : ''));
   }
@@ -592,6 +601,22 @@ class Sql
     $substr = strpos($substr, '`') === false ? "'$substr'" : $substr;
     $str = strpos($str, '`') === false ? "'$str'" : $str;
     return self::create("LOCATE($substr, $str".(empty($pos) ? ')' : ", $pos)").($alias ? " AS `$alias`" : ''));
+  }
+
+  /**
+   * สร้างคำสั่ง BETWEEN ... AND ...
+   *
+   * @param string $column_name1
+   * @param string $column_name2
+   * @return \static
+   *
+   * @assert ('create_date', 'U.create_date')->text() [==] "BETWEEN `create_date` AND U.`create_date`"
+   * @assert ('table_name.field_name', 'U.`create_date`')->text() [==] "BETWEEN `table_name`.`field_name` AND U.`create_date`"
+   * @assert ('`database`.`table`', '12-1-1')->text() [==] "BETWEEN `database`.`table` AND '12-1-1'"
+   */
+  public static function BETWEEN($column_name1, $column_name2)
+  {
+    return self::create('BETWEEN '.self::fieldName($column_name1).' AND '.self::fieldName($column_name2));
   }
 
   /**
