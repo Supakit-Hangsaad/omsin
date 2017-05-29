@@ -101,7 +101,13 @@ if (!defined('ROOT_PATH')) {
 /**
  *  http หรือ https
  */
-$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+  $scheme = $_SERVER['HTTP_X_FORWARDED_PROTO'].'://';
+} elseif ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) {
+  $scheme = 'https://';
+} else {
+  $scheme = 'http://';
+}
 /**
  * host name
  */

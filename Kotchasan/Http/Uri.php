@@ -124,7 +124,13 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    */
   public static function createFromGlobals()
   {
-    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
+    if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+      $scheme = $_SERVER['HTTP_X_FORWARDED_PROTO'].'://';
+    } elseif ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) {
+      $scheme = 'https://';
+    } else {
+      $scheme = 'http://';
+    }
     if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
       $host = trim(current(explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'])));
     } elseif (empty($_SERVER['HTTP_HOST'])) {
@@ -398,17 +404,13 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    */
   private function isNonStandardPort($scheme, $host, $port)
   {
-    $schemes = array(
-      'http' => 80,
-      'https' => 443,
-    );
     if (!$scheme && $port) {
       return true;
     }
     if (!$host || !$port) {
       return false;
     }
-    return !isset($schemes[$scheme]) || $port !== $schemes[$scheme];
+    return ($scheme != 'http' && $scheme != 'https') || ($port != 80 && $port != 443);
   }
 
   /**
