@@ -6,7 +6,8 @@
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
  */
-var modal = null;
+var loader = null,
+  modal = null;
 function send(target, query, callback, wait, c) {
   var req = new GAjax();
   req.initLoading(wait || 'wait', false, c);

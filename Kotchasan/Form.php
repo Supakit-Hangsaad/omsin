@@ -198,7 +198,7 @@ class Form extends \Kotchasan\KBase
       $prop['data-result'] = 'data-result="result_'.$result.'"';
     }
     if (isset($accept) && is_array($accept)) {
-      $prop['accept'] = 'accept="'.Mime::getEccept($accept).'"';
+      $prop['accept'] = 'accept="'.Mime::getAccept($accept).'"';
     }
     if (isset($multiple)) {
       $prop['multiple'] = 'multiple';

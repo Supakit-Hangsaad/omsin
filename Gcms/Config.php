@@ -25,6 +25,7 @@ class Config extends \Kotchasan\Config
   public $login_fields = array('username');
   /**
    * สถานะสมาชิก
+   * 0 สมาชิกทั่วไป
    * 1 ผู้ดูแลระบบ
    *
    * @var array
@@ -43,6 +44,11 @@ class Config extends \Kotchasan\Config
   public $color_status = array(
     0 => '#259B24',
     1 => '#FF0000',
+    2 => '#FF6600',
+    3 => '#3366FF',
+    4 => '#902AFF',
+    5 => '#660000',
+    6 => '#336600',
   );
   /**
    * กำหนดอายุของแคช (วินาที)
