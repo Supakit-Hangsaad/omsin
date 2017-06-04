@@ -133,7 +133,7 @@ class AbstractRequest extends AbstractMessage implements RequestInterface
       $query[$key] = $key.'='.$value;
     }
     if (!empty($query)) {
-      $uri .= (strpos('?', $uri) === false ? '?' : '&').implode('&', $query);
+      $uri .= (strpos($uri, '?') === false ? '?' : '&').implode('&', $query);
     }
     return Uri::createFromUri($uri);
   }
@@ -151,7 +151,7 @@ class AbstractRequest extends AbstractMessage implements RequestInterface
       $query[$key] = $key.'='.$value;
     }
     if (!empty($query)) {
-      $uri .= (strpos('?', $uri) === false ? '?' : '&').implode('&', $query);
+      $uri .= (strpos($uri, '?') === false ? '?' : '&').implode('&', $query);
     }
     return Uri::createFromUri($uri);
   }
@@ -172,7 +172,7 @@ class AbstractRequest extends AbstractMessage implements RequestInterface
       $query[$key] = $value === null ? $key : $key.'='.$value;
     }
     if (!empty($query)) {
-      $uri .= (strpos('?', $uri) === false ? '?' : '&').implode('&', $query);
+      $uri .= (strpos($uri, '?') === false ? '?' : '&').implode('&', $query);
     }
     return Uri::createFromUri($uri);
   }

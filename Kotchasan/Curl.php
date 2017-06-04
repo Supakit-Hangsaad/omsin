@@ -109,7 +109,7 @@ class Curl
     $this->options[CURLOPT_CUSTOMREQUEST] = 'GET';
     $this->options[CURLOPT_HTTPGET] = true;
     if (is_array($params)) {
-      $this->url .= (strpos('?', $this->url) === false ? '?' : '&').http_build_query($params, NULL, '&');
+      $this->url .= (strpos($this->url, '?') === false ? '?' : '&').http_build_query($params, NULL, '&');
     }
     return $this;
   }
