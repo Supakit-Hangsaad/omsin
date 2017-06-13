@@ -3191,6 +3191,8 @@ td.buttons .button:last-child {
     max-width: 100%;
     z-index: 1;
     background-color: rgba(255, 255, 255, 0.7);
+    padding: 0 !important;
+    margin: 0 !important;
   }
   body.responsive  input.toggle-menu:checked ~ #slidemenu_content label.toggle-menu {
     background-color: rgba(0,0,0,0.7);
@@ -3245,6 +3247,7 @@ td.buttons .button:last-child {
     color: #FFF;
     background-color: #474747;
     background-color: rgba(255,255,255,0.05);
+    text-shadow: none;
   }
   body.responsive .topmenu.slidemenu > ul ul > li > a > span {
     padding-left: 1em;
