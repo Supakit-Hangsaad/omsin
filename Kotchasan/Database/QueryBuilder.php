@@ -306,7 +306,7 @@ class QueryBuilder extends \Kotchasan\Database\Query
         $this->sqls['keys'][$key] = $value;
       } else {
         $this->sqls['keys'][$key] = ':'.$key;
-        $this->sqls['values'][':'.$key] = $value;
+        $this->values[':'.$key] = $value;
       }
     }
     return $this;

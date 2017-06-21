@@ -1052,12 +1052,12 @@ window.$K = (function () {
       }
       return this;
     },
-    autoupdate: function (url, interval, getrequest, callback) {
+    autoupdate: function (url, interval, getRequest, callback) {
       this._xhr = this.xhr();
       this.interval = interval * 1000;
       if (!Object.isNull(this._xhr)) {
         this.url = url;
-        this.getrequest = getrequest;
+        this.getRequest = getRequest;
         this.callback = callback;
         this._abort = false;
         this._getupdate();
@@ -1069,11 +1069,11 @@ window.$K = (function () {
         var parameters = null;
         var url = this.url;
         var option = this.options;
-        if (Object.isFunction(this.getrequest)) {
+        if (Object.isFunction(this.getRequest)) {
           if (option.method == 'get') {
-            url += '?' + this.getrequest();
+            url += '?' + this.getRequest();
           } else {
-            parameters = this.getrequest();
+            parameters = this.getRequest();
           }
         }
         parameters = (option.method == 'post' && parameters == null) ? '' : parameters;
@@ -1091,9 +1091,11 @@ window.$K = (function () {
             xhr.setRequestHeader('Content-Type', option.contentType + '; charset=' + option.encoding);
           }
         }
+        temp.showLoading();
         xhr.send(parameters);
         xhr.onreadystatechange = function () {
           if (xhr.readyState == 4 && xhr.status == 200) {
+            temp.hideLoading();
             if (temp.callback) {
               temp.callback(xhr);
             }

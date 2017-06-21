@@ -2534,6 +2534,7 @@ blockquote {
   font-style: italic;
   position: relative;
   padding: 10px 10px 10px 45px;
+  overflow: hidden;
 }
 blockquote > b:first-child {
   display: block;
