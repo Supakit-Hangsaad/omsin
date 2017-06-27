@@ -140,7 +140,7 @@ class Template
    * @return string คืนค่า HTML template
    *
    * @assert ('/{TITLE}/', 'Title', '<b>{TITLE}</b>') [==] '<b>Title</b>'
-   * @assert ('/{LNG_([\w\s\.\-\'\(\),%\/:&\#;]+)}/e', '\Kotchasan\Language::get(array(1=>"$1"))', '<b>{LNG_Language test}</b>') [==] '<b>Language test</b>'
+   * @assert ('/{LNG_([\w\s\.\-\'\(\),%\/:&\#;]+)}/e', '\Kotchasan\Language::parse(array(1=>"$1"))', '<b>{LNG_Language test}</b>') [==] '<b>Language test</b>'
    */
   public static function pregReplace($patt, $replace, $skin)
   {

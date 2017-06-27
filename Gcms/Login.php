@@ -123,7 +123,7 @@ class Login extends \Kotchasan\Login implements \Kotchasan\LoginInterface
       if ($search === false) {
         self::$login_message = Language::get('not a registered user');
       } else {
-        // รหัสผ่านใหม่
+        // สุ่มรหัสผ่านใหม่
         $password = \Kotchasan\Text::rndname(6);
         // ข้อมูลอีเมล์
         $replace = array(

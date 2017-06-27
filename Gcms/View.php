@@ -8,6 +8,8 @@
 
 namespace Gcms;
 
+use \Kotchasan\Language;
+
 /**
  * View base class สำหรับ GCMS.
  *
@@ -31,9 +33,9 @@ class View extends \Kotchasan\View
       // url สำหรับกลับไปหน้าก่อนหน้า
       '/{BACKURL(\?([a-zA-Z0-9=&\-_@\.]+))?}/e' => '\Gcms\View::back',
       /* ภาษา */
-      '/{LNG_([^}]+)}/e' => '\Kotchasan\Language::get(array(1=>"$1"))',
+      '/{LNG_([^}]+)}/e' => '\Kotchasan\Language::parse(array(1=>"$1"))',
       /* ภาษา ที่ใช้งานอยู่ */
-      '/{LANGUAGE}/' => \Kotchasan\Language::name()
+      '/{LANGUAGE}/' => Language::name(),
     ));
     return parent::renderHTML($template);
   }

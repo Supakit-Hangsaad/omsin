@@ -31,12 +31,18 @@ class Curl
   protected $headers = array();
   /**
    * ตัวแปรสำหรับเก็บ Error ที่มาจาก cURL
-   * สำเร็จ คืนค่า false
-   * ไม่สำเร็จ คืนค่าข้อความ error
+   * 0 ไม่มี error (ค่าเริ่มต้น)
+   * มากกว่า 0 Error No. ของ cURL
    *
-   * @var boolean|string
+   * @var int
    */
-  protected $error = false;
+  protected $error = 0;
+  /**
+   * ข้อความ Error จาก cURL หากมีข้อผิดพลาดในการส่ง
+   *
+   * @var string
+   */
+  protected $errorMessage = '';
 
   /**
    * Construct
@@ -65,13 +71,24 @@ class Curl
   }
 
   /**
-   * คืนค่า Error จากการ execute
+   * คืนค่า error no จากการ cURL
+   * 0 หมายถึงไม่มี error
    *
-   * @return string
+   * @return int
    * */
   function error()
   {
     return $this->error;
+  }
+
+  /**
+   * คืนค่าข้อความ Error จาก cURL หากมีข้อผิดพลาดในการส่ง
+   *
+   * @return string
+   * */
+  function errorMessage()
+  {
+    return $this->errorMessage;
   }
 
   /**
@@ -265,8 +282,9 @@ class Curl
       curl_setopt($ch, $key, $value);
     }
     $response = curl_exec($ch);
-    if (!$response) {
-      $this->error = curl_error($ch).' ['.curl_errno($ch).']';
+    if (curl_error($ch)) {
+      $this->error = curl_errno($ch);
+      $this->errorMessage = curl_error($ch);
     }
     curl_close($ch);
     return $response;

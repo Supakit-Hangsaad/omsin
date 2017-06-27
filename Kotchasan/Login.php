@@ -101,7 +101,7 @@ class Login extends \Kotchasan\KBase implements LoginInterface
       setCookie('login_password', '', $time, '/');
       self::$login_message = Language::get('Logout successful');
     } elseif (self::$request->post('action')->toString() === 'forgot') {
-      // ตรวจสอบอีเมล์สำหรับการขอรหัสผ่านใหม่
+      // ขอรหัสผ่านใหม่
       return $login->forgot(self::$request);
     } elseif (!$login->from_submit && isset($_SESSION['login']) && is_array($_SESSION['login'])) {
       // login อยู่แล้ว

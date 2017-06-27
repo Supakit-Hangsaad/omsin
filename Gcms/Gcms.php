@@ -8,6 +8,8 @@
 
 namespace Gcms;
 
+use \Kotchasan\Language;
+
 /**
  * GCMS utility class
  *
@@ -35,7 +37,7 @@ class Gcms extends \Kotchasan\KBase
     foreach (self::$cfg->languages as $item) {
       $languages[$item] = $item;
     }
-    foreach (\Kotchasan\Language::installedLanguage() as $item) {
+    foreach (Language::installedLanguage() as $item) {
       $languages[$item] = $item;
     }
     return array_keys($languages);

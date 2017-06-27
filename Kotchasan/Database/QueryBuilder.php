@@ -295,7 +295,7 @@ class QueryBuilder extends \Kotchasan\Database\Query
    * @param array $datas รูปแบบ array(key1=>value1, key2=>value2)
    * @return \static
    *
-   * @assert insert('user', array('id' => 1, 'name' => 'test'))->text() [==] "INSERT INTO `user` (`id`, `name`) VALUES (:id, :name)"
+   * @assert insert('user', array('id' => 1, 'name' => 'test'))->text() [==] "INSERT INTO `user` (`id`, `name`) VALUES (1, 'test')"
    */
   public function insert($table, $datas)
   {
@@ -320,7 +320,7 @@ class QueryBuilder extends \Kotchasan\Database\Query
    * @param array $datas รูปแบบ array(key1=>value1, key2=>value2)
    * @return \static
    *
-   * @assert insertOrUpdate('user', array('id' => 1, 'name' => 'test'))->text() [==] "INSERT INTO `user` (`id`, `name`) VALUES (:id, :name) ON DUPLICATE KEY UPDATE `id`=VALUES(`id`), `name`=VALUES(`name`)"
+   * @assert insertOrUpdate('user', array('id' => 1, 'name' => 'test'))->text() [==] "INSERT INTO `user` (`id`, `name`) VALUES (1, 'test') ON DUPLICATE KEY UPDATE `id`=VALUES(`id`), `name`=VALUES(`name`)"
    */
   public function insertOrUpdate($table, $datas)
   {

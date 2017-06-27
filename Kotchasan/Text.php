@@ -164,7 +164,7 @@ class Text
 
   /**
    * ฟังก์ชั่นรับค่าสำหรับใช้เป็น username
-   * รองรับอีเมล์ ตัวเลข (หมายเลขโทรศัพท์) @ ? - _ . เท่านั้น
+   * รองรับอีเมล์ ตัวเลข (หมายเลขโทรศัพท์) @ - _ . เท่านั้น
    *
    * @param string $value
    * @return string
@@ -174,7 +174,7 @@ class Text
    */
   public static function username($value)
   {
-    return preg_replace('/[^a-zA-Z0-9@\?\.\-_]+/', '', $value);
+    return preg_replace('/[^a-zA-Z0-9@\.\-_]+/', '', $value);
   }
 
   /**
