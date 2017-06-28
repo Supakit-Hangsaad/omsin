@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/views/editprofile
+ * @filesource modules/index/views/editprofile.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -8,11 +8,11 @@
 
 namespace Index\Editprofile;
 
-use \Gcms\Login;
 use \Kotchasan\Html;
+use \Gcms\Login;
 
 /**
- * module=editprofile
+ * ฟอร์มแก้ไขสมาชิก
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -22,7 +22,7 @@ class View extends \Gcms\View
 {
 
   /**
-   * ฟอร์มเพิ่ม แก้ไข พนักงาน
+   * module=editprofile
    *
    * @param array $user
    * @param array $login
@@ -37,8 +37,8 @@ class View extends \Gcms\View
         'autocomplete' => 'off',
         'action' => 'index.php/index/model/editprofile/submit',
         'onsubmit' => 'doFormSubmit',
-        'token' => true,
-        'ajax' => true
+        'ajax' => true,
+        'token' => true
     ));
     $fieldset = $form->add('fieldset', array(
       'title' => '{LNG_Personal information}'

@@ -1,13 +1,12 @@
 /**
- * Javascript Libraly for GCMS (front-end + back-end)
+ * Javascript Libraly for Ajax Front-end and Back-end
  *
  * @filesource js/common.js
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
  */
-var loader = null,
-  modal = null;
+var loader, modal = null;
 function send(target, query, callback, wait, c) {
   var req = new GAjax();
   req.initLoading(wait || 'wait', false, c);
@@ -130,18 +129,10 @@ function defaultSubmit(ds) {
   }
   if (_location) {
     if (_location == 'reload') {
-      if (loader) {
-        loader.reload();
-      } else {
-        reload();
-      }
+      loader.reload();
     } else if (_location == 'back') {
-      if (loader) {
-        loader.back();
-      } else {
-        window.history.go(-1);
-      }
-    } else if (loader && _location != _url) {
+      loader.back();
+    } else if (_location != _url) {
       loader.location(_location);
     } else {
       window.location = _location.replace(/&amp;/g, '&');
@@ -157,7 +148,7 @@ function doFormSubmit(xhr) {
   }
 }
 function checkUsername() {
-  var patt = /[a-zA-Z0-9]+/;
+  var patt = /[a-zA-Z0-9@\.\-_]+/;
   var value = this.value;
   var ids = this.id.split('_');
   var id = '&id=' + floatval($E(ids[0] + '_id').value);

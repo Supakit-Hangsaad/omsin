@@ -150,7 +150,7 @@ class Form extends \Kotchasan\KBase
       } else {
         $value = isset($value) ? $value : null;
       }
-      if (isset($options)) {
+      if (isset($options) && is_array($options)) {
         $datas = array();
         foreach ($options as $k => $v) {
           if (is_array($value)) {
@@ -161,7 +161,7 @@ class Form extends \Kotchasan\KBase
           $datas[] = '<option value="'.$k.'"'.$sel.'>'.$v.'</option>';
         }
         $value = implode('', $datas);
-      } elseif (isset($optgroup)) {
+      } elseif (isset($optgroup) && is_array($optgroup)) {
         $datas = array();
         foreach ($optgroup as $group_label => $options) {
           $datas[] = '<optgroup label="'.$group_label.'">';

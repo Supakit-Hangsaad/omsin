@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/models/editprofile.php
+ * @filesource modules/index/models/editprofile.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -13,8 +13,7 @@ use \Kotchasan\Login;
 use \Kotchasan\Language;
 
 /**
- * ข้อมูลพนักงาน, การ login
- * ตาราง user ใช้ id เป็น primaryKey
+ * บันทึกข้อมูลสมาชิก
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *

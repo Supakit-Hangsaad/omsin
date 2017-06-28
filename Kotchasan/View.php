@@ -155,24 +155,24 @@ class View extends \Kotchasan\KBase
   }
 
   /**
-   * ฟังก์ชั่น แทนที่ query string ด้วยข้อมูลจาก get สำหรับส่งต่อไปยัง URL ถัดไป
+   * ฟังก์ชั่น แทนที่ query string ด้วยข้อมูลจาก GET สำหรับส่งต่อไปยัง URL ถัดไป
    *
    * @param array|string $f รับค่าจากตัวแปร $f มาสร้าง query string
    * array ส่งมาจาก preg_replace
    * string กำหนดเอง
    * @return string คืนค่า query string ใหม่ ลบ id=0
-   * @assert (array(2 => 'module=retmodule')) [==] "http://localhost/?module=retmodule&amp;page=1&amp;sort=id"  [[$_SERVER['QUERY_STRING'] = '_module=test&_page=1&_sort=id']]
-   * @assert ('module=retmodule') [==] "http://localhost/?module=retmodule&amp;page=1&amp;sort=id" [[$_SERVER['QUERY_STRING'] = '_module=test&_page=1&_sort=id']]
+   * @assert (array(2 => 'module=retmodule&id=0')) [==] "http://localhost/?module=retmodule&amp;page=1&amp;sort=id"  [[$_SERVER['QUERY_STRING'] = '_module=test&1234&_page=1&_sort=id&action=login&id=1']]
+   * @assert ('module=retmodule&5678') [==] "http://localhost/?module=retmodule&amp;page=1&amp;sort=id&amp;id=1&amp;5678"
    */
   public static function back($f)
   {
     $uri = self::$request->getUri();
     $query_url = array();
-    foreach (explode('&', str_replace('&amp;', '&', $uri->getQuery())) as $item) {
-      if (preg_match('/^(_)?(.*)=(.*)$/', $item, $match)) {
-        if ($match[1] === '_') {
-          $query_url[$match[2]] = $match[3];
-        } elseif (!isset($query_url[$match[2]])) {
+    foreach (explode('&', $uri->getQuery()) as $item) {
+      if (preg_match('/^(_)?(.*)=([^$]{1,})$/', $item, $match)) {
+        if ($match[2] == 'action' && ($match[3] == 'login' || $match[3] == 'logout')) {
+          // ไม่ใช้รายการ action=login, action=logout
+        } else {
           $query_url[$match[2]] = $match[3];
         }
       }
@@ -181,16 +181,17 @@ class View extends \Kotchasan\KBase
       $f = isset($f[2]) ? $f[2] : null;
     }
     if (!empty($f)) {
-      foreach (explode('&', str_replace('&amp;', '&', $f)) as $item) {
-        if (preg_match('/^(.*)=(.*)$/', $item, $match)) {
-          $query_url[$match[1]] = $match[2];
-        }
-      }
-      $temp = $query_url;
-      $query_url = array();
-      foreach ($temp as $key => $value) {
-        if (!(empty($value) || ($key == 'action' && ($value == 'login' || $value == 'logout')))) {
-          $query_url[$key] = $value;
+      foreach (explode('&', $f) as $item) {
+        if (preg_match('/^([a-zA-Z0-9_\-]+)(=(.*))?$/', $item, $match)) {
+          if (!isset($match[3])) {
+            // ไม่มี value
+            $query_url[$match[1]] = null;
+          } else if ($match[3] === '0') {
+            // ไม่ใช้รายการที่หลังเครื่องหมาย = เท่ากับ 0
+            unset($query_url[$match[1]]);
+          } else {
+            $query_url[$match[1]] = $match[3];
+          }
         }
       }
     }

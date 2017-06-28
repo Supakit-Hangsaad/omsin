@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/controllers/error.php
+ * @filesource modules/index/controllers/error.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -9,10 +9,9 @@
 namespace Index\Error;
 
 use \Kotchasan\Template;
-use \Kotchasan\Language;
 
 /**
- * Error Controller
+ * Error Controller ถ้าไม่สามารถทำรายการได้
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -22,14 +21,24 @@ class Controller extends \Gcms\Controller
 {
 
   /**
-   * Error Controller ของส่วนแอดมิน
+   * แสดงหน้า 404.html
+   *
+   * @return string
+   */
+  public function render()
+  {
+    // คืนค่า 404.html
+    return Template::create('', '', '404')->render();
+  }
+
+  /**
+   * แสดงหน้า 404.html (static)
+   *
+   * @return string
    */
   public static function page404()
   {
-    $section = Template::create('', '', '404');
-    $section->add(array(
-      '/{CONTENT}/' => Language::get('Can not be performed this request. Because they do not find the information you need or you are not allowed')
-    ));
-    return $section->render();
+    $obj = new static;
+    return $obj->render();
   }
 }

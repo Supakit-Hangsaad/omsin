@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/models/menu.php
+ * @filesource modules/index/models/menu.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -19,11 +19,12 @@ class Model
 {
 
   /**
-   * รายการเมนูของแอดมิน
+   * รายการเมนู
    *
-   * @return object
+   * @param array $login
+   * @return array
    */
-  public static function memberMenu()
+  public static function getMenus($login)
   {
     $menus = array(
       'dashboard' => array(

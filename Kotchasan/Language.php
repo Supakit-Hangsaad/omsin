@@ -375,19 +375,27 @@ final class Language extends \Kotchasan\KBase
 
   /**
    * ค้นหาข้อความภาษาที่ต้องการ ถ้าไม่พบคืนค่า $default
+   * ถ้าไม่ระบุ $default (null) คืนค่า $key
+   * ถ้าระบุ $value_key มาด้วยและ ค่าของภาษาเป็นแอเรย์ จะคืนค่า แอเรย์ของภาษาที่ $value_key
    *
    * @param string $key
    * @param mixed $default
+   * @param mixed $value_key
    *
    * @assert ('YEAR_OFFSET') [==] 543
+   * @assert ('DATE_LONG', null, 0) [==] 'อาทิตย์'
    * @assert ('not found', 'default') [==] 'default'
    */
-  public static function find($key, $default = '')
+  public static function find($key, $default = null, $value_key = null)
   {
     if (null === self::$languages) {
       new static;
     }
-    return isset(self::$languages->$key) ? self::$languages->$key : $default;
+    $result = isset(self::$languages->$key) ? self::$languages->$key : ($default === null ? $key : $default);
+    if ($value_key !== null && is_array($result)) {
+      $result = $result[$value_key];
+    }
+    return $result;
   }
 
   /**

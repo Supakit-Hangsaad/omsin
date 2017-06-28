@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/models/register.php
+ * @filesource modules/index/models/register.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -14,7 +14,7 @@ use \Gcms\Email;
 use \Kotchasan\Validator;
 
 /**
- * action=register
+ * ลงทะเบียนสมาชิกใหม่
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -24,11 +24,13 @@ class Model extends \Kotchasan\Model
 {
 
   /**
-   * สมัครสมาชิก
+   * module=register
+   *
+   * @param Request $request
    */
   public function submit(Request $request)
   {
-    // session, token, member
+    // session, token
     if ($request->initSession() && $request->isSafe()) {
       $ret = array();
       // รับค่าจากการ POST

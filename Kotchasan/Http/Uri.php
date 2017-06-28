@@ -472,6 +472,8 @@ class Uri extends \Kotchasan\KBase implements UriInterface
       $key = ltrim($key, '_');
       if ($key != 'token' && key_exists($key, $query_string) && $query_string[$key] === null) {
         continue;
+      } elseif (preg_match('/^[0-9]+$/', $key)) {
+        continue;
       }
       if ($value !== null) {
         $qs['_'.$key] = rawurlencode($value);

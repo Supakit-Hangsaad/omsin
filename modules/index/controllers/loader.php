@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/controllers/loader.php
+ * @filesource modules/index/controllers/loader.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -11,22 +11,22 @@ namespace Index\Loader;
 use \Kotchasan\Http\Request;
 use \Gcms\Login;
 use \Kotchasan\Template;
-use \Gcms\Gcms;
 
 /**
- * Controller สำหรับโหลดข้อมูลด้วย GLoader
+ * Controller สำหรับโหลดหน้าเว็บด้วย GLoader
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
  * @since 1.0
  */
-class Controller extends \Kotchasan\Controller
+class Controller extends \Gcms\Controller
 {
 
   /**
    * มาจากการเรียกด้วย GLoader
    *
    * @param Request $request
+   * @return JSON string
    */
   public function index(Request $request)
   {
@@ -39,7 +39,7 @@ class Controller extends \Kotchasan\Controller
       // กำหนด skin ให้กับ template
       Template::init(self::$cfg->skin);
       // View
-      Gcms::$view = new \Gcms\View;
+      self::$view = new \Gcms\View;
       // โมดูลจาก URL ถ้าไม่มีใช้ default (dashboard)
       $module = $request->post('module', 'dashboard')->toString();
       if (preg_match('/^([a-z]+)([\/\-]([a-z]+))?$/i', $module, $match)) {
@@ -67,12 +67,12 @@ class Controller extends \Kotchasan\Controller
       }
       $controller = new $className;
       // เนื้อหา
-      Gcms::$view->setContents(array(
+      self::$view->setContents(array(
         '/{CONTENT}/' => $controller->render($request)
       ));
       // output เป็น HTML
       $ret = array(
-        'detail' => Gcms::$view->renderHTML(Template::load('', '', 'loader')),
+        'detail' => self::$view->renderHTML(Template::load('', '', 'loader')),
         'menu' => $controller->menu(),
         'topic' => $controller->title(),
         'to' => $request->post('to', 'scroll-to')->filter('a-z0-9_')

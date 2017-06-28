@@ -64,7 +64,7 @@ class Login extends \Kotchasan\Login implements \Kotchasan\LoginInterface
   }
 
   /**
-   * ฟังก์ชั่นตรวจสอบการ login
+   * ฟังก์ชั่นตรวจสอบการ login และบันทึกการเข้าระบบ
    *
    * @param string $username
    * @param string $password

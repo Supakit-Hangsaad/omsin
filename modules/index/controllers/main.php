@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/controllers/main.php
+ * @filesource modules/index/controllers/main.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -12,7 +12,7 @@ use \Kotchasan\Http\Request;
 use \Kotchasan\Template;
 
 /**
- * Controller หลัก สำหรับแสดง backend ของ GCMS
+ * Controller หลัก สำหรับแสดงหน้าเว็บไซต์
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -22,7 +22,7 @@ class Controller extends \Gcms\Controller
 {
 
   /**
-   * หน้าหลักแอดมิน
+   * หน้าหลักเว็บไซต์
    *
    * @param Request $request
    * @return string
@@ -40,13 +40,13 @@ class Controller extends \Gcms\Controller
         $module = $match[3];
       }
     } else {
-      // หน้า default ถ้าไม่ระบุ module มา
+      // ถ้าไม่ระบุ module มาแสดงหน้า dashboard
       $owner = 'index';
       $module = 'dashboard';
     }
     // ตรวจสอบหน้าที่เรียก
     if (is_file(APP_PATH.'modules/'.$owner.'/controllers/'.$module.'.php')) {
-      // หน้าที่เรียก (Admin)
+      // หน้าที่เรียก
       include APP_PATH.'modules/'.$owner.'/controllers/'.$module.'.php';
       $className = ucfirst($owner).'\\'.ucfirst($module).'\Controller';
     } else {

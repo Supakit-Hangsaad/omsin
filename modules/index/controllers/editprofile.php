@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/controllers/editprofile.php
+ * @filesource modules/index/controllers/editprofile.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -24,23 +24,23 @@ class Controller extends \Gcms\Controller
 {
 
   /**
-   * แก้ไขข้อมูลส่วนตัว
+   * แก้ไขข้อมูลส่วนตัวสมาชิก
    *
    * @param Request $request
    * @return string
    */
   public function render(Request $request)
   {
+    // ข้อความ title bar
+    $this->title = Language::get('Edit profile');
+    // เลือกเมนู
+    $this->menu = 'tools';
     // สมาชิก
     if ($login = Login::isMember()) {
       // อ่านข้อมูลที่ id ถ้าไม่มีใช้คนที่ login
       $user = \Index\Member\Model::get($request->request('id', $login['id'])->toInt());
       // ตัวเอง
       if ($user && $user['id'] == $login['id']) {
-        // ข้อความ title bar
-        $this->title = Language::get('Editing your account');
-        // เลือกเมนู
-        $this->menu = 'tools';
         // แสดงผล
         $section = Html::create('section');
         // breadcrumbs

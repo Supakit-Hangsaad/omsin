@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/views/welcome.php
+ * @filesource modules/index/views/welcome.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -23,6 +23,12 @@ use \Kotchasan\Login;
 class View extends \Kotchasan\View
 {
 
+  /**
+   * ฟอร์มเข้าระบบ
+   *
+   * @param Request $request
+   * @return object
+   */
   public static function login(Request $request)
   {
     // template
@@ -40,6 +46,12 @@ class View extends \Kotchasan\View
     );
   }
 
+  /**
+   * ฟอร์มขอรหัสผ่านใหม่
+   *
+   * @param Request $request
+   * @return object
+   */
   public static function forgot(Request $request)
   {
     // template
@@ -56,6 +68,12 @@ class View extends \Kotchasan\View
     );
   }
 
+  /**
+   * ฟอร์มสมัครสมาชิก
+   *
+   * @param Request $request
+   * @return object
+   */
   public static function register(Request $request)
   {
     // template

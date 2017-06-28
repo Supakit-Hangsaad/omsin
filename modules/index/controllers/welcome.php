@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/controllers/welcome.php
+ * @filesource modules/index/controllers/welcome.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -11,7 +11,7 @@ namespace Index\Welcome;
 use \Kotchasan\Http\Request;
 
 /**
- * หน้าแรกสุดก่อนเข้าระบบ
+ * Controller สำหรับการเข้าระบบ
  *
  * @author Goragod Wiriya <admin@goragod.com>
  *
@@ -28,9 +28,13 @@ class Controller extends \Gcms\Controller
    */
   public function execute(Request $request)
   {
+    // action ที่เลือก
     $action = $request->get('action')->toString();
+    // ตรวจสอบ method ที่กำหนดไว่เท่านั้น
     $action = in_array($action, array('register', 'forgot')) ? $action : 'login';
+    // เรียก method ที่ส่งมา
     $view = \Index\Welcome\View::$action($request);
+    // คืนค่า
     $this->title = $view->title;
     return $view->content;
   }

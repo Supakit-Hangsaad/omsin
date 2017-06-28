@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource index/models/checker.php
+ * @filesource modules/index/models/checker.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -29,7 +29,7 @@ class Model extends \Kotchasan\Model
     if (self::$request->isReferer()) {
       $id = self::$request->post('id')->toInt();
       $value = self::$request->post('value')->url();
-      // ตรวจสอบอีเมล์ซ้ำ
+      // ตรวจสอบ username ซ้ำ
       $search = $this->db()->first($this->getTableName('user'), array('username', $value));
       if ($search && ($id == 0 || $id != $search->id)) {
         echo Language::replace('This :name already exist', array(':name' => Language::get('Email')));
