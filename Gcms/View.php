@@ -77,23 +77,6 @@ class View extends \Kotchasan\View
   }
 
   /**
-   * อ่านภาษาที่ติดตั้งตามลำดับการตั้งค่า
-   *
-   * @return array
-   */
-  public static function installedLanguage()
-  {
-    $languages = array();
-    foreach (self::$cfg->languages as $item) {
-      $languages[$item] = $item;
-    }
-    foreach (Language::installedLanguage() as $item) {
-      $languages[$item] = $item;
-    }
-    return array_keys($languages);
-  }
-
-  /**
    * คืนค่าลิงค์รูปแบบโทรศัพท์
    *
    * @param string $phone_number
