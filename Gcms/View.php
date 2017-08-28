@@ -51,13 +51,13 @@ class View extends \Kotchasan\View
   {
     $query_url = array();
     foreach (self::$request->getQueryParams() as $key => $value) {
-      if ($value != '') {
+      if ($value != '' && $key != 'module') {
         $key = ltrim($key, '_');
         $query_url[$key] = $key.'='.$value;
       }
     }
     foreach (self::$request->getParsedBody() as $key => $value) {
-      if ($value != '') {
+      if ($value != '' && $key != 'module') {
         $key = ltrim($key, '_');
         $query_url[$key] = $key.'='.$value;
       }

@@ -8,6 +8,8 @@
 
 namespace Kotchasan;
 
+use \Kotchasan\Text;
+
 /**
  * Input Object
  *
@@ -206,7 +208,7 @@ class InputItem
    */
   public function topic()
   {
-    return trim(preg_replace('/[\r\n\s\t]+/', ' ', $this->htmlspecialchars()));
+    return Text::topic($this->value);
   }
 
   /**
@@ -222,8 +224,7 @@ class InputItem
    */
   public function url()
   {
-    $this->value = preg_replace('/(^javascript:|[\(\)\'\"]+)/', '', trim($this->value));
-    return $this->htmlspecialchars(false);
+    return Text::url($this->value);
   }
 
   /**
@@ -248,7 +249,7 @@ class InputItem
    */
   public function password()
   {
-    return preg_replace('/[^\w]+/', '', $this->value);
+    return Text::password($this->value);
   }
 
   /**
@@ -262,7 +263,7 @@ class InputItem
    */
   public function text()
   {
-    return trim($this->htmlspecialchars());
+    return trim(Text::htmlspecialchars($this->value));
   }
 
   /**
@@ -432,21 +433,6 @@ class InputItem
   {
     if (!empty($len) && !empty($str)) {
       $str = mb_substr($str, 0, (int)$len);
-    }
-    return $str;
-  }
-
-  /**
-   * แปลง & " ' < > \ { } เป็น HTML entities ใช้แทน htmlspecialchars() ของ PHP
-   *
-   * @param boolean $double_encode true (default) แปลง รหัส HTML เช่น &amp; เป็น &amp;amp;, false ไม่แปลง
-   * @return \static
-   */
-  private function htmlspecialchars($double_encode = true)
-  {
-    $str = preg_replace(array('/&/', '/"/', "/'/", '/</', '/>/', '/\\\/', '/\{/', '/\}/'), array('&amp;', '&quot;', '&#039;', '&lt;', '&gt;', '&#92;', '&#x007B;', '&#x007D;'), $this->value);
-    if (!$double_encode) {
-      $str = preg_replace('/&(amp;([#a-z0-9]+));/i', '&\\2;', $str);
     }
     return $str;
   }

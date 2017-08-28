@@ -119,7 +119,8 @@
         loader_patt5 = new RegExp('^' + WEB_URL + '(.*).html$'),
         p1 = /module=(.*)?/,
         urls = url.replace(/&amp;/g, '&').split('?'),
-        new_q = new Array();
+        new_q = new Array(),
+        hs;
       if (urls[1] && loader_patt0.exec(urls[1])) {
         new_q.push(urls[1]);
         return new_q;

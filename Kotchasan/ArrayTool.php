@@ -228,12 +228,16 @@ class ArrayTool
    */
   public static function merge($source, $with)
   {
-    if (is_array($with)) {
-      foreach ($with as $key => $value) {
-        if (isset($source[$key]) && is_array($source[$key])) {
-          $source[$key] = self::merge($source[$key], $value);
-        } else {
-          $source[$key] = $value;
+    foreach (func_get_args() As $i => $items) {
+      if ($i == 0) {
+        $source = $items;
+      } elseif (is_array($items) || is_object($items)) {
+        foreach ($items as $key => $value) {
+          if (isset($source[$key]) && is_array($source[$key])) {
+            $source[$key] = self::merge($source[$key], $value);
+          } else {
+            $source[$key] = $value;
+          }
         }
       }
     }

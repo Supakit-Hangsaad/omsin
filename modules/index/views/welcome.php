@@ -35,14 +35,14 @@ class View extends \Kotchasan\View
     $template = Template::create('', '', 'login');
     $template->add(array(
       '/{TOKEN}/' => $request->createToken(),
-      '/{EMAIL}/' => Login::$text_username,
-      '/{PASSWORD}/' => Login::$text_password,
+      '/{EMAIL}/' => Login::$login_params['username'],
+      '/{PASSWORD}/' => Login::$login_params['password'],
       '/{MESSAGE}/' => Login::$login_message,
       '/{CLASS}/' => empty(Login::$login_message) ? 'hidden' : (empty(Login::$login_input) ? 'message' : 'error')
     ));
     return (object)array(
         'content' => $template->render(),
-        'title' => self::$cfg->web_description.' - '.Language::get('Login with an existing account')
+        'title' => Language::get('Login with an existing account')
     );
   }
 
@@ -58,13 +58,13 @@ class View extends \Kotchasan\View
     $template = Template::create('', '', 'forgot');
     $template->add(array(
       '/{TOKEN}/' => $request->createToken(),
-      '/{EMAIL}/' => Login::$text_username,
+      '/{EMAIL}/' => Login::$login_params['username'],
       '/{MESSAGE}/' => Login::$login_message,
       '/{CLASS}/' => empty(Login::$login_message) ? 'hidden' : (empty(Login::$login_input) ? 'message' : 'error')
     ));
     return (object)array(
         'content' => $template->render(),
-        'title' => self::$cfg->web_description.' - '.Language::get('Get new password')
+        'title' => Language::get('Get new password')
     );
   }
 
@@ -85,7 +85,7 @@ class View extends \Kotchasan\View
     ));
     return (object)array(
         'content' => $template->render(),
-        'title' => self::$cfg->web_description.' - '.Language::get('Register')
+        'title' => Language::get('Register')
     );
   }
 }

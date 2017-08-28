@@ -18,7 +18,7 @@
         callBack: $K.emptyFunction,
         get: $K.emptyFunction,
         populate: $K.emptyFunction,
-        onRequest: $K.emptyFunction,
+        onEmpty: $K.emptyFunction,
         onSuccess: $K.emptyFunction,
         loadingClass: 'wait',
         url: false,
@@ -70,7 +70,9 @@
       }
       var _mouseclick = function () {
         onSelect.call(this);
-        options.onSuccess.call(input);
+        if (Object.isFunction(options.onSuccess)) {
+          options.onSuccess.call(input);
+        }
       };
       var _mousemove = function () {
         _movehighlight(this.itemindex);
@@ -108,19 +110,15 @@
       var _search = function () {
         window.clearTimeout(self.timer);
         req.abort();
-        if (!cancleEvent) {
+        if (!cancleEvent && options.url) {
           var q = options.get.call(this);
-          if (options.url && q && q != '') {
+          if (q && q != '') {
             input.addClass(options.loadingClass);
             self.timer = window.setTimeout(function () {
               req.send(options.url, q, function (xhr) {
                 input.removeClass(options.loadingClass);
                 if (xhr.responseText !== '') {
                   var datas = xhr.responseText.toJSON();
-                  var ret = options.onRequest.call(self, datas);
-                  if (ret) {
-                    datas = ret;
-                  }
                   listindex = 0;
                   if (datas) {
                     _populateitems(datas);
@@ -146,6 +144,9 @@
             }, options.interval);
           } else {
             _hide();
+            if (Object.isFunction(options.onEmpty)) {
+              options.onEmpty.call(input);
+            }
           }
         }
         cancleEvent = false;
@@ -177,7 +178,9 @@
               onSelect.call(this);
             }
           });
-          options.onSuccess.call(input);
+          if (Object.isFunction(options.onSuccess)) {
+            options.onSuccess.call(input);
+          }
         } else if (key == 32) {
           if (this.value == '') {
             _search();

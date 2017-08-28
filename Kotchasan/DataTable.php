@@ -60,6 +60,13 @@ class DataTable extends \Kotchasan\KBase
    */
   private $checkCol = -1;
   /**
+   * กำหนดการแสดงผล checkbox
+   * ถ้าเป็น true จะซ่อน checkbox เสมอ
+   *
+   * @var boolean
+   */
+  public $hideCheckbox = false;
+  /**
    * แสดงตารางกว้าง 100%
    *
    * @var bool
@@ -220,6 +227,10 @@ class DataTable extends \Kotchasan\KBase
   /**
    * method สำหรับเตรียมการแสดงผล button
    * ถ้าคืนค่า false กลับมาจะไม่มีการสรางปุ่ม
+   * function($btn, $attributes, $items)
+   * $btn string id ของ button
+   * $attributes array property ของปุ่ม
+   * $items array ข้อมูลในแถว
    *
    * @var array array($this, methodName)
    */
@@ -227,6 +238,7 @@ class DataTable extends \Kotchasan\KBase
   /**
    * method เรียกเมื่อต้องการสร้าง footer
    * คืนค่า tag tr ที่อยู่ภายใน footer
+   * function()
    *
    * @var array array($this, methodName)
    */
@@ -251,11 +263,25 @@ class DataTable extends \Kotchasan\KBase
    */
   private $javascript = array();
   /**
+   * เปิดใช้งาน Javascript ของตาราง
+   * true เปิดใช้งาน GTable
+   * false ปิดใช้งาน GTable แต่ยังแทรก Javascript อื่นๆได้
+   *
+   * @var boolean
+   */
+  public $enableJavascript = true;
+  /**
    * Uri ปัจจุบันของหน้าเว็บ
    *
    * @var Uri
    */
   private $uri;
+  /**
+   * ตัวเลือกจำนวนการแสดงผล
+   *
+   * @var array
+   */
+  public $entriesList = array(10, 20, 30, 40, 50, 100);
 
   /**
    * Initial Class
@@ -276,19 +302,24 @@ class DataTable extends \Kotchasan\KBase
     // รายการต่อหน้า มาจากการเลือกภายในตาราง
     if ($this->perPage > 0) {
       $count = self::$request->globals(array('POST', 'GET'), 'count')->toInt();
-      if ($count > 0) {
+      if (in_array($count, $this->entriesList)) {
         $this->perPage = $count;
         $this->uri = $this->uri->withParams(array('count' => $count));
       }
     }
     // header ของตาราง มาจาก model หรือมาจากข้อมูล หรือ มาจากการกำหนดเอง
     if (isset($this->model)) {
+      // แปลงฐานข้อมูลเป็น Model
+      $model = new \Kotchasan\Model;
+      $model = $model->db()->createQuery()->select();
       // อ่านข้อมูลรายการแรกเพื่อใช้ชื่อฟิลด์เป็นหัวตาราง
       if (is_string($this->model)) {
         // model เป็น Recordset, create Recordset
         $rs = new \Kotchasan\Orm\Recordset($this->model);
         // แปลง Recordset เป็น QueryBuilder
-        $this->model = $rs->toQueryBuilder();
+        $this->model = $model->from(array($rs->toQueryBuilder(), 'Z9'));
+      } else {
+        $this->model = $model->from(array($this->model, 'Z9'));
       }
       // อ่านข้อมูลรายการแรก
       $first = $this->model->copy()->first($this->fields);
@@ -301,7 +332,7 @@ class DataTable extends \Kotchasan\KBase
         foreach ($this->fields as $field) {
           if (is_array($field)) {
             $this->columns[$field[1]] = array('text' => $field[1]);
-          } elseif (preg_match('/(.*?[`\s]+)?([a-z0-9_]+)`?$/i', $field, $match)) {
+          } elseif (is_string($field) && preg_match('/(.*?[`\s]+)?([a-z0-9_]+)`?$/i', $field, $match)) {
             $this->columns[$match[2]] = array('text' => $match[2]);
           }
         }
@@ -384,11 +415,15 @@ class DataTable extends \Kotchasan\KBase
     $form = array();
     if ($this->perPage > 0) {
       $entries = Language::get('entries');
+      $options = array();
+      foreach ($this->entriesList as $c) {
+        $options[$c] = $c.' '.$entries;
+      }
       $form[] = $this->addFilter(array(
         'name' => 'count',
         'text' => Language::get('Show'),
         'value' => $this->perPage,
-        'options' => array(10 => '10 '.$entries, 20 => '20 '.$entries, 30 => '30 '.$entries, 40 => '40 '.$entries, 50 => '50 '.$entries, 100 => '100 '.$entries)
+        'options' => $options
       ));
     }
     // รายการ Query กำหนดโดย User (AND)
@@ -441,6 +476,7 @@ class DataTable extends \Kotchasan\KBase
       $form[] = '<fieldset class=search>';
       $form[] = '<label accesskey=f><input type=text name=search value="'.$search.'" placeholder="'.Language::get('Search').'"></label>';
       $form[] = '<button type=submit>&#xe607;</button>';
+      $form[] = '<button type=submit class=clear_search>&#x78;</button>';
       $form[] = '</fieldset>';
     }
     if (!empty($form)) {
@@ -572,7 +608,7 @@ class DataTable extends \Kotchasan\KBase
       $colspan = 0;
       foreach ($this->headers as $key => $attributes) {
         if ($colspan === 0) {
-          if ($i == $this->checkCol) {
+          if (!$this->hideCheckbox && $i == $this->checkCol) {
             $row[] = '<th class="check-column"><a class="checkall icon-uncheck"></a></th>';
             $colCount++;
           }
@@ -617,7 +653,7 @@ class DataTable extends \Kotchasan\KBase
       $tfoot = null;
       if (isset($this->onCreateFooter)) {
         $tfoot = call_user_func($this->onCreateFooter);
-      } elseif ($this->checkCol > -1) {
+      } elseif (!$this->hideCheckbox && $this->checkCol > -1) {
         $tfoot = '<tr>';
         $tfoot .= '<td colspan="'.$this->checkCol.'"></td>';
         $tfoot .= '<td class="check-column"><a class="checkall icon-uncheck"></a></td>';
@@ -635,7 +671,9 @@ class DataTable extends \Kotchasan\KBase
       if (!empty($this->addNew)) {
         $prop = array();
         foreach ($this->addNew as $k => $v) {
-          $prop[$k] = $k.'="'.$v.'"';
+          if ($k != 'text') {
+            $prop[$k] = $k.'="'.$v.'"';
+          }
         }
         if (preg_match('/^((.*)\s+)?(icon-[a-z0-9\-_]+)(\s+(.*))?$/', $this->addNew['class'], $match)) {
           $prop['class'] = 'class="'.trim($match[2].' '.(isset($match[5]) ? $match[5] : '')).'"';
@@ -653,21 +691,25 @@ class DataTable extends \Kotchasan\KBase
       }
     }
     $content[] = '</div>';
-    $script = array(
-      'page' => $page,
-      'search' => $search,
-      'sort' => $this->sort,
-      'action' => $this->action,
-      'actionCallback' => $this->actionCallback,
-      'actionConfirm' => $this->actionConfirm,
-      'onBeforeDelete' => $this->onBeforeDelete,
-      'onInitRow' => $this->onInitRow,
-      'onAddRow' => $this->onAddRow,
-      'pmButton' => $this->pmButton,
-      'dragColumn' => $this->dragColumn
-    );
-    $this->javascript[] = 'var table = new GTable("'.$this->id.'", '.json_encode($script).');';
-    $content[] = "<script>\n".implode("\n", $this->javascript)."\n</script>";
+    if ($this->enableJavascript) {
+      $script = array(
+        'page' => $page,
+        'search' => $search,
+        'sort' => $this->sort,
+        'action' => $this->action,
+        'actionCallback' => $this->actionCallback,
+        'actionConfirm' => $this->actionConfirm,
+        'onBeforeDelete' => $this->onBeforeDelete,
+        'onInitRow' => $this->onInitRow,
+        'onAddRow' => $this->onAddRow,
+        'pmButton' => $this->pmButton,
+        'dragColumn' => $this->dragColumn
+      );
+      $this->javascript[] = 'var table = new GTable("'.$this->id.'", '.json_encode($script).');';
+    }
+    if (!empty($this->javascript)) {
+      $content[] = "<script>\n".implode("\n", $this->javascript)."\n</script>";
+    }
     return implode("\n", $content);
   }
 
@@ -705,7 +747,7 @@ class DataTable extends \Kotchasan\KBase
         $i = 0;
         foreach ($this->headers as $field => $attributes) {
           if (!empty($field) && !in_array($field, $this->hideColumns)) {
-            if ($i == $this->checkCol) {
+            if (!$this->hideCheckbox && $i == $this->checkCol) {
               $row[] = '<td headers="r'.$id.'" class="check-column"><a id="check_'.$id.'" class="icon-uncheck"></a></td>';
             }
             if ($i == $this->dragColumn) {
@@ -847,20 +889,29 @@ class DataTable extends \Kotchasan\KBase
     if (preg_match('/^((.*)\s+)?(icon-[a-z0-9\-_]+)(\s+(.*))?$/', $item['class'], $match)) {
       $match[2] = trim($match[2].' '.(isset($match[5]) ? $match[5] : ''));
     }
-    if (isset($item['href'])) {
-      // links, button
-      if (empty($match[3])) {
-        return '<a class="'.$item['class'].'" href="'.$item['href'].'">'.$item['text'].'</a>';
-      } else {
-        return '<a class="'.$match[2].'" href="'.$item['href'].'"><span class="'.$match[3].'">'.$item['text'].'</span></a>';
-      }
-    } elseif (isset($item['options'])) {
+    if (isset($item['options'])) {
       // select
       $rows = array();
       foreach ($item['options'] as $key => $text) {
         $rows[] = '<option value="'.$key.'">'.$text.'</option>';
       }
       return '<fieldset><select id="'.$item['id'].'">'.implode('', $rows).'</select><label for="'.$item['id'].'" class="button '.$item['class'].' action"><span>'.$item['text'].'</span></label></fieldset>';
+    } else {
+      // links, button
+      $prop = array();
+      if (empty($match[3])) {
+        $text = $item['text'];
+        $prop[] = 'class="'.$item['class'].'"';
+      } else {
+        $text = '<span class="'.$match[3].'">'.$item['text'].'</span>';
+        $prop[] = 'class="'.$match[2].'"';
+      }
+      foreach ($item as $k => $v) {
+        if ($k != 'class' && $k != 'text') {
+          $prop[] = $k.'="'.$v.'"';
+        }
+      }
+      return '<a '.implode(' ', $prop).'>'.$text.'</a>';
     }
   }
 

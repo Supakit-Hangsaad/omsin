@@ -727,7 +727,7 @@ window.$K = (function () {
         this.selectedIndex = _find(this, v);
       } else if (t == 'input') {
         if (this.type == 'checkbox' || this.type == 'radio') {
-          this.checked = (parseFloat(v) == 1);
+          this.checked = (v == this.value);
         } else {
           this.value = v.unentityify();
         }

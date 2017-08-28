@@ -39,17 +39,76 @@ class Text
   }
 
   /**
+   * แปลง tag และ ลบช่องว่างไม่เกิน 1 ช่อง ไม่ขึ้นบรรทัดใหม่
+   * เช่นหัวข้อของบทความ
+   *
+   * @param string $text
+   * @return string
+   *
+   * @assert (' ทด\/สอบ'."\r\n\t".'<?php echo \'555\'?> ') [==] 'ทด&#92;/สอบ &lt;?php echo &#039;555&#039;?&gt;'
+   */
+  public static function topic($text)
+  {
+    return trim(preg_replace('/[\r\n\s\t]+/', ' ', self::htmlspecialchars($text)));
+  }
+
+  /**
+   * แปลง tag ไม่แปลง &amp;
+   * และลบช่องว่างหัวท้าย
+   * สำหรับ URL หรือ email
+   *
+   * @return string
+   *
+   * @assert (" http://www.kotchasan.com?a=1&b=2&amp;c=3 ") [==] 'http://www.kotchasan.com?a=1&amp;b=2&amp;c=3'
+   * @assert ("javascript:alert('xxx')") [==] 'alertxxx'
+   * @assert ("http://www.xxx.com/javascript/") [==] 'http://www.xxx.com/javascript/'
+   */
+  public static function url($text)
+  {
+    $text = preg_replace('/(^javascript:|[\(\)\'\"]+)/', '', trim($text));
+    return self::htmlspecialchars($text, false);
+  }
+
+  /**
+   * ฟังก์ชั่นรับค่าสำหรับใช้เป็น username
+   * รองรับอีเมล์ ตัวเลข (หมายเลขโทรศัพท์) @ - _ . เท่านั้น
+   *
+   * @param string $text
+   * @return string
+   *
+   * @assert (' ad_min@demo.com') [==] 'ad_min@demo.com'
+   * @assert ('012 3465') [==] '0123465'
+   */
+  public static function username($text)
+  {
+    return preg_replace('/[^a-zA-Z0-9@\.\-_]+/', '', $text);
+  }
+
+  /**
+   * รับค่าสำหรับ password อักขระทุกตัวไม่มีช่องว่าง
+   *
+   * @param string $text
+   * @return string
+   *
+   * @assert (" 0\n12   34\r\r6\t5 ") [==] '0123465'
+   */
+  public static function password($text)
+  {
+    return preg_replace('/[^\w]+/', '', $text);
+  }
+
+  /**
    * ฟังก์ชั่น เข้ารหัส อักขระพิเศษ และ {} ก่อนจะส่งให้กับ textarea หรือ editor ตอนแก้ไข
    * & " ' < > { } ไม่แปลง รหัส HTML เช่น &amp; &#38;
    *
-   * @param string $source ข้อความ
+   * @param string $text ข้อความ
    * @return string
    *
    * @assert ('&"'."'<>{}&amp;&#38;") [==] "&amp;&quot;&#039;&lt;&gt;&#x007B;&#x007D;&amp;&#38;"
    */
-  public static function toEditor($source)
+  public static function toEditor($text)
   {
-    return preg_replace(array('/&/', '/"/', "/'/", '/</', '/>/', '/{/', '/}/', '/&(amp;([\#a-z0-9]+));/'), array('&amp;', '&quot;', '&#039;', '&lt;', '&gt;', '&#x007B;', '&#x007D;', '&\\2;'), $source);
+    return preg_replace(array('/&/', '/"/', "/'/", '/</', '/>/', '/{/', '/}/', '/&(amp;([\#a-z0-9]+));/'), array('&amp;', '&quot;', '&#039;', '&lt;', '&gt;', '&#x007B;', '&#x007D;', '&\\2;'), $text);
   }
 
   /**
@@ -163,21 +222,6 @@ class Text
   }
 
   /**
-   * ฟังก์ชั่นรับค่าสำหรับใช้เป็น username
-   * รองรับอีเมล์ ตัวเลข (หมายเลขโทรศัพท์) @ - _ . เท่านั้น
-   *
-   * @param string $value
-   * @return string
-   *
-   * @assert (' ad_min@demo.com') [==] 'ad_min@demo.com'
-   * @assert ('012 3465') [==] '0123465'
-   */
-  public static function username($value)
-  {
-    return preg_replace('/[^a-zA-Z0-9@\.\-_]+/', '', $value);
-  }
-
-  /**
    * ฟังก์ชั่นคืนค่าข้อความซ้ำๆตามจำนวนที่กำหนด
    *
    * @param string $text ข้อความหรือตัวอักษรที่ต้องการทำซ้ำ
@@ -193,5 +237,21 @@ class Text
       $result .= $text;
     }
     return $result;
+  }
+
+  /**
+   * แปลง & " ' < > \ { } เป็น HTML entities ใช้แทน htmlspecialchars() ของ PHP
+   *
+   * @param string $text
+   * @param boolean $double_encode true (default) แปลง รหัส HTML เช่น &amp; เป็น &amp;amp;, false ไม่แปลง
+   * @return string
+   */
+  public static function htmlspecialchars($text, $double_encode = true)
+  {
+    $str = preg_replace(array('/&/', '/"/', "/'/", '/</', '/>/', '/\\\/', '/\{/', '/\}/'), array('&amp;', '&quot;', '&#039;', '&lt;', '&gt;', '&#92;', '&#x007B;', '&#x007D;'), $text);
+    if (!$double_encode) {
+      $str = preg_replace('/&(amp;([#a-z0-9]+));/i', '&\\2;', $str);
+    }
+    return $str;
   }
 }

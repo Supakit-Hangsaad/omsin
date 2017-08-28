@@ -189,6 +189,6 @@ class Collection implements \Countable, \IteratorAggregate, \ArrayAccess
    */
   public function getIterator()
   {
-    return new ArrayIterator($this->datas);
+    return new \ArrayIterator($this->datas);
   }
 }

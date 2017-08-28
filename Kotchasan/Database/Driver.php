@@ -270,7 +270,11 @@ abstract class Driver extends Query
   public function getNextId($table_name)
   {
     $result = $this->doCustomQuery("SHOW TABLE STATUS LIKE '$table_name'");
-    return $result && sizeof($result) == 1 ? (int)$result[0]['Auto_increment'] : 1;
+    if (!$result) {
+      throw new \InvalidArgumentException("Table `{$table_name}` not found");
+    } else {
+      return (int)$result[0]['Auto_increment'];
+    }
   }
 
   /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * @filesource css/views/index.php
+ * @filesource modules/css/views/index.php
  * @link http://www.kotchasan.com/
  * @copyright 2016 Goragod.com
  * @license http://www.kotchasan.com/license/
@@ -29,6 +29,21 @@ class View extends \Kotchasan\KBase
     // css ของ template
     $data2 = file_get_contents(TEMPLATE_ROOT.'skin/'.self::$cfg->skin.'/style.css');
     $data2 = preg_replace('/url\(([\'"])?(img|fonts)\//isu', "url(\\1".WEB_URL.'skin/\\2/', $data2);
+    // css ของโมดูล
+    $dir = ROOT_PATH.'modules/';
+    $f = @opendir($dir);
+    if ($f) {
+      while (false !== ($text = readdir($f))) {
+        if ($text != "." && $text != "..") {
+          if (is_dir($dir.$text)) {
+            if (is_file($dir.$text.'/style.css')) {
+              $data2 .= preg_replace('/url\(img\//isu', 'url('.WEB_URL.'modules/'.$text.'/img/', file_get_contents($dir.$text.'/style.css'));
+            }
+          }
+        }
+      }
+      closedir($f);
+    }
     foreach (self::$cfg->color_status as $key => $value) {
       $data2 .= '.status'.$key.'{color:'.$value.'}';
     }

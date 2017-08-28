@@ -69,7 +69,7 @@
       var ret = true,
         v = this.editor.value ? this.editor.value : this.editor.innerHTML;
       if (Object.isFunction(this.onSave)) {
-        ret = this.onSave.call(this.src, v);
+        ret = this.onSave.call(this.src, v, this.editor);
       } else {
         this.src.setValue(v);
       }

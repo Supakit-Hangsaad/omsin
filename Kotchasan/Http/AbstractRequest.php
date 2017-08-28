@@ -142,7 +142,7 @@ class AbstractRequest extends AbstractMessage implements RequestInterface
    * สร้างคลาสจากลิงค์ และ รวมค่าที่มาจาก $_GET และ $_POST ด้วย
    *
    * @param string $uri
-   * @return \static
+   * @return Uri
    */
   public static function createUriWithPost($uri)
   {
@@ -160,7 +160,7 @@ class AbstractRequest extends AbstractMessage implements RequestInterface
    * สร้างคลาสจากลิงค์ และ รวมค่าที่มาจาก $_GET และ $_POST ด้วย
    *
    * @param string $uri
-   * @return \static
+   * @return Uri
    */
   public function createUriWithGlobals($uri)
   {

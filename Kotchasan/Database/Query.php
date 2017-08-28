@@ -159,8 +159,8 @@ abstract class Query extends \Kotchasan\Database\Db
       $ret = $fields->text();
     } elseif ($fields == '*') {
       $ret = '*';
-    } elseif (preg_match('/^([0-9]+)([\s]+as)?[\s]+`?([^`]+)`?$/i', $fields, $match)) {
-      // 0 as alias
+    } elseif (preg_match('/^(NULL|[0-9]+)([\s]+as)?[\s]+`?([^`]+)`?$/i', $fields, $match)) {
+      // 0 as alias, NULL as alias
       $ret = $match[1].' AS `'.$match[3].'`';
     } elseif (preg_match('/^([\'"])(.*)\\1([\s]+as)?[\s]+`?([^`]+)`?$/i', $fields, $match)) {
       // 'string' as alias

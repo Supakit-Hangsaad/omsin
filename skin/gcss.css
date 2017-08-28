@@ -1529,6 +1529,7 @@ html[dir="rtl"] .topmenu > ul ul ul {
   padding: 0 !important;
   list-style-type: none;
   border-color: inherit;
+  overflow: visible;
 }
 .btntab > ul {
   margin-left: 1px;
@@ -2751,13 +2752,12 @@ tbody tr:not(.thead):not(.tfoot):hover, tbody tr.highlight, tbody tr.select, .da
 .datatable .table_nav.action {
   padding: 0 10px 10px;
 }
+.table_nav > .button,
 .table_nav fieldset {
   display: inline-block;
   margin: 0 5px 0 0 !important;
   position: relative;
   padding-bottom: 0 !important;
-  vertical-align: middle;
-  line-height: normal;
 }
 .table_nav fieldset.search {
   position: absolute;

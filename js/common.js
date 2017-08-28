@@ -64,6 +64,10 @@ function defaultSubmit(ds) {
     } else if (prop == 'url') {
       _url = val;
       _location = val;
+    } else if (prop == 'open') {
+      window.setTimeout(function () {
+        window.open(val);
+      }, 1);
     } else if (prop == 'tab') {
       initWriteTab("accordient_menu", val);
     } else if (remove.test(prop)) {
@@ -302,7 +306,7 @@ $G(window).Ready(function () {
   if (navigator.userAgent.indexOf("MSIE") > -1) {
     document.body.addClass("ie");
   }
-  forEach($E(document.body).getElementsByTagName('nav'), function () {
+  forEach(document.body.elems('nav'), function () {
     if ($G(this).hasClass('topmenu sidemenu slidemenu gddmenu')) {
       new GDDMenu(this);
     }

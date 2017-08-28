@@ -186,7 +186,7 @@ class View extends \Kotchasan\KBase
           if (!isset($match[3])) {
             // ไม่มี value
             $query_url[$match[1]] = null;
-          } else if ($match[3] === '0') {
+          } elseif ($match[3] === '0') {
             // ไม่ใช้รายการที่หลังเครื่องหมาย = เท่ากับ 0
             unset($query_url[$match[1]]);
           } else {

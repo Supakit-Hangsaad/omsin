@@ -175,6 +175,26 @@
           });
         }
       }
+      forEach(this.table.elems('button'), function () {
+        if (this.className == 'clear_search') {
+          temp.clear_search = this;
+          temp.input_search = this.parentNode.firstChild.firstChild;
+          callClick(this, function () {
+            temp.input_search.value = "";
+          });
+        }
+      });
+      var doSearchChanged = function () {
+        if (temp.input_search.value == '') {
+          temp.clear_search.style.display = 'none';
+        } else {
+          temp.clear_search.style.display = 'block';
+        }
+      };
+      if (temp.input_search) {
+        $G(temp.input_search).addEvent('change', doSearchChanged);
+        doSearchChanged.call(temp);
+      }
     },
     callAction: function (el, action) {
       var hs = this.options.action.split('?');

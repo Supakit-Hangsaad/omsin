@@ -221,7 +221,7 @@ class PdoMysqlDriver extends Driver
     $updates = array();
     $params = array();
     foreach ($save as $key => $value) {
-      $updates[] = ':U'.$key;
+      $updates[] = '`'.$key.'`=:U'.$key;
       $params[':U'.$key] = $value;
     }
     $sql = $this->makeInsert($table_name, $save, $params);
@@ -229,7 +229,7 @@ class PdoMysqlDriver extends Driver
     try {
       $query = $this->connection->prepare($sql);
       $query->execute($params);
-      $this->log(__FUNCTION__, $sql, $values);
+      $this->log(__FUNCTION__, $sql);
       self::$query_count++;
       return (int)$this->connection->lastInsertId();
     } catch (PDOException $e) {

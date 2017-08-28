@@ -95,7 +95,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    * สร้างคลาสจากลิงค์
    *
    * @param string $uri
-   * @return \static
+   * @return Uri
    * @throws \InvalidArgumentException ถ้า $uri ไม่ถูกต้อง
    */
   public static function createFromUri($uri)
@@ -119,7 +119,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
   /**
    * สร้าง Uri จากตัวแปร $_SERVER
    *
-   * @return \static
+   * @return Uri
    * @throws \InvalidArgumentException ถ้า Uri ไม่ถูกต้อง
    */
   public static function createFromGlobals()
@@ -237,7 +237,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    * กำหนดค่า scheme ของ Uri
    *
    * @param string $scheme http หรือ https หรือค่าว่าง
-   * @return \static คืนค่า Object ใหม่
+   * @return Uri คืนค่า Object ใหม่
    * @throws \InvalidArgumentException ถ้าไม่ใช่ ค่าว่าง http หรือ https
    */
   public function withScheme($scheme)
@@ -252,7 +252,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    *
    * @param string $user
    * @param string $password
-   * @return \static คืนค่า Object ใหม่
+   * @return Uri คืนค่า Object ใหม่
    */
   public function withUserInfo($user, $password = null)
   {
@@ -265,7 +265,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    * กำหนดชื่อ host
    *
    * @param string $host ชื่อ host
-   * @return \static คืนค่า Object ใหม่
+   * @return Uri คืนค่า Object ใหม่
    */
   public function withHost($host)
   {
@@ -278,7 +278,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    * กำหนดค่า port
    *
    * @param null|int $port หมายเลข port 1- 65535 หรือ null
-   * @return \static คืนค่า Object ใหม่
+   * @return Uri คืนค่า Object ใหม่
    * @throws \InvalidArgumentException ถ้า port ไม่ถูกต้อง
    */
   public function withPort($port)
@@ -294,7 +294,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    * หรือเป็นค่าว่าง ถ้าเป็นรากของโดเมน
    *
    * @param string $path ชื่อ path
-   * @return \static คืนค่า Object ใหม่
+   * @return Uri คืนค่า Object ใหม่
    */
   public function withPath($path)
   {
@@ -307,7 +307,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    * กำหนดค่า query string
    *
    * @param string $query
-   * @return \static คืนค่า Object ใหม่
+   * @return Uri คืนค่า Object ใหม่
    * @throws \InvalidArgumentException ถ้า query string ไม่ถูกต้อง
    */
   public function withQuery($query)
@@ -325,7 +325,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    * กำหนดค่า fragment
    *
    * @param string $fragment
-   * @return \static คืนค่า Object ใหม่
+   * @return Uri คืนค่า Object ใหม่
    * @throws \InvalidArgumentException ถ้า fragment ไม่ถูกต้อง
    */
   public function withFragment($fragment)
@@ -533,7 +533,7 @@ class Uri extends \Kotchasan\KBase implements UriInterface
    *
    * @param array $params
    * @param boolean $encode false (default) เชื่อม Querystring ด้วย &, true  เชื่อม Querystring ด้วย &amp;
-   * @return \static
+   * @return Uri
    */
   public function withParams($params, $encode = false)
   {
@@ -612,8 +612,8 @@ class Uri extends \Kotchasan\KBase implements UriInterface
   private function createBack($url, $source, $query_string)
   {
     foreach ($source as $key => $value) {
-      if (preg_match('/^_{1,}(.*)$/', $key, $match)) {
-        if (!key_exists($match[1], $query_string)) {
+      if ($value !== '' && preg_match('/^_{1,}(.*)$/', $key, $match)) {
+        if (!isset($query_string[$match[1]])) {
           $query_string[$match[1]] = $value;
         }
       }

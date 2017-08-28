@@ -84,13 +84,11 @@ class Email extends \Kotchasan\Model
       if (!empty(self::$cfg->email_Port)) {
         $mail->Port = self::$cfg->email_Port;
       }
-      $mail->smtpConnect(
-        array(
-          "ssl" => array(
-            "verify_peer" => false,
-            "verify_peer_name" => false,
-            "allow_self_signed" => true
-          )
+      $mail->SMTPOptions = array(
+        'ssl' => array(
+          'verify_peer' => false,
+          'verify_peer_name' => false,
+          'allow_self_signed' => true
         )
       );
       $mail->AddReplyTo($replyto[0], $replyto[1]);

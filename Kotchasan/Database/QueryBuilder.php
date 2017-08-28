@@ -265,7 +265,12 @@ class QueryBuilder extends \Kotchasan\Database\Query
       $this->values = ArrayTool::replace($this->values, $ret[1]);
       $ret = $ret[0];
     }
-    $this->sqls['where'] .= (empty($this->sqls['where']) ? ' ' : ' AND ').'EXISTS (SELECT * FROM '.$this->getFullTableName($table).' WHERE '.$ret.')';
+    if (empty($this->sqls['where'])) {
+      $this->sqls['where'] = '';
+    } else {
+      $this->sqls['where'] = ' AND';
+    }
+    $this->sqls['where'] .= ' EXISTS (SELECT * FROM '.$this->getFullTableName($table).' WHERE '.$ret.')';
     return $this;
   }
 
@@ -415,7 +420,7 @@ class QueryBuilder extends \Kotchasan\Database\Query
    * @assert select('table.field', '`table`.`field`')->text() [==] "SELECT `table`.`field`,`table`.`field`"
    * @assert select('table.field field', '`table`.`field` `field`')->text() [==] "SELECT `table`.`field` AS `field`,`table`.`field` AS `field`"
    * @assert select('table.field AS field', '`table`.`field` AS `field`')->text() [==] "SELECT `table`.`field` AS `field`,`table`.`field` AS `field`"
-   * @assert select('U.field', 'U1.`field`')->text() [==] "SELECT U.`field`,U1.`field`"
+   * @assert select('U.field', 'U1.`field`', 'NULL id')->text() [==] "SELECT U.`field`,U1.`field`,NULL AS `id`"
    * @assert select('U.field field', 'U1.`field` `field`')->text() [==] "SELECT U.`field` AS `field`,U1.`field` AS `field`"
    * @assert select('U.field AS field', 'U1.`field` AS `field`')->text() [==] "SELECT U.`field` AS `field`,U1.`field` AS `field`"
    * @assert select(Sql::YEAR('create_date', 'year'), Sql::MONTH('create_date', 'month'))->text() [==] "SELECT YEAR(`create_date`) AS `year`,MONTH(`create_date`) AS `month`"

@@ -124,8 +124,10 @@ class FileCache extends Cache
         if ($text != "." && $text != ".." && $text != 'index.php') {
           if (is_dir($dir.$text)) {
             $this->clearCache($dir.$text.'/', $error);
-          } elseif (!@unlink($dir.$text)) {
-            $error[] = $dir.$text;
+          } elseif (is_file($dir.$text)) {
+            if (@unlink($dir.$text) === false) {
+              $error[] = $dir.$text;
+            }
           }
         }
       }

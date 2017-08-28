@@ -171,6 +171,19 @@ class UploadedFile implements UploadedFileInterface
   }
 
   /**
+   * ตรวจสอบว่ามีข้อผิดพลาดการอัปโหลดหรือไม่
+   *
+   * @return boolean คืนค่า false ถ้าไม่มีไฟล์อัปโหลดหรืออัปโหลดสำเร็จ, คืนค่า true ถ้ามีข้อผิดพลาด
+   */
+  public function hasError()
+  {
+    if ($this->error === null || $this->error === UPLOAD_ERR_OK || $this->error === UPLOAD_ERR_NO_FILE) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * อ่านข้อผิดพลาดของไฟล์อัปโหลด เป็นข้อความ
    *
    * @staticvar array $errors
